@@ -1,6 +1,7 @@
 
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Screens/Screening/Vitals/BloodGlucose.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
@@ -76,14 +77,6 @@ class Glucose extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: 
-                        // controller.fileImage64 == null
-                        //     ? Center(
-                        //         child: Text(
-                        //         "Click Add Image Button",
-                        //         style: TextStyle(fontSize: 18),
-                        //       ))
-                        //     : Image.memory(
-                        //         base64Decode(controller.fileImage64)),
                               const Center(
                                 child: Text(
                                 "Click Add Image Button",
@@ -148,53 +141,34 @@ class Glucose extends StatelessWidget {
 
                           // searchBox("Report of ?",["Mother", "Child"]),
 
-                          TFField(label: "Glucose Value",
-                          ),
-
-                        // TextFormField(
-                        //   decoration: InputDecoration(
-                        //     labelText: "Hemoglobin Value",
-                            
-                        //   ),
-                        // ),
 
 
 
-                           SizedBox(
-                height: 10.0,
-              ),
-
-              // searchBox("Select Type of Report", [
-              //     "ECG",
-              //     "Blood Test",
-              //     "HCG",
-              //     "Lab Test",
-              //     "x-ray",
-              //     "Ultrasound Scan",
-              //     "CT Scan",
-              //     "Mammogram",
-              //     "MRI",
-              //     "Others"
-              //   ]),
 
                                            SizedBox(
                 height: 10.0,
               ),
 
-                            TextFormField(
-                // controller: reportController.reportDesc,
-                decoration: InputDecoration(
-                    labelText: "Write Description",
-                    border: OutlineInputBorder()),
-                keyboardType: TextInputType.text,
-                maxLines: 5,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter Description';
-                  }
-                  return null;
-                },
-              ),
+
+
+
+                          ListTile(
+                            leading: Image.asset("assets/labReports/hemoglobin.png"),
+                            title: Text("Blood Glucose Value : 12"),
+                            subtitle: Text("Tap to Change "),
+                            shape: OutlineInputBorder(borderSide: BorderSide(
+                              color: Colors.grey
+                            )),
+
+                            onTap: () {
+                              showDialog(context: context, builder:(context) {
+                                return AlertDialog(
+                                  title: Text("Blood Glucose Value"),
+
+                                  content: BloodGlucose());
+                              },);
+                            },
+                          ),
 
               const SizedBox(
                 height: 20.0,

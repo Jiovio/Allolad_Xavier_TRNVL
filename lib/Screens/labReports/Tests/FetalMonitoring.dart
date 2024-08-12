@@ -1,20 +1,22 @@
 
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Screens/Screening/Vitals/HeartRate.dart';
 import 'package:allolab/Screens/labReports/Scan/HemoglobinScan.dart';
 import 'package:allolab/Screens/labReports/Widgets/hemoglobinSelector.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:get/route_manager.dart';
+import 'package:numberpicker/numberpicker.dart';
 
-class Hemoglobin extends StatelessWidget {
-  const Hemoglobin({super.key});
+class Fetalmonitoring extends StatelessWidget {
+   Fetalmonitoring({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Hemoglobin Report"),
+        title: Text("Fetal Monitoring "),
       ),
 
       body: SingleChildScrollView(
@@ -165,8 +167,8 @@ class Hemoglobin extends StatelessWidget {
 
 
                           ListTile(
-                            leading: Image.asset("assets/labReports/hemoglobin.png"),
-                            title: Text("Hemoglobin Value : 12"),
+                            leading: Image.asset("assets/labReports/heart.png"),
+                            title: Text("Heart Rate : 60 BPM"),
                             subtitle: Text("Tap to Change "),
                             shape: OutlineInputBorder(borderSide: BorderSide(
                               color: Colors.grey
@@ -175,12 +177,50 @@ class Hemoglobin extends StatelessWidget {
                             onTap: () {
                               showDialog(context: context, builder:(context) {
                                 return AlertDialog(
-                                  title: Text("Hemogolin Value"),
+                                  title: Text("Heart Rate "),
 
-                                  content: HemoglobinSelector());
+                                  content: Row(
+                                    children: [
+                                      NumberPicker(
+                                                      
+                                            value: 40,
+                                                          minValue: 30,
+                                                          itemHeight: 32,
+                                                          maxValue: 150,
+                                                          onChanged: (value) {
+                                                          
+                                                          },
+                                                        ),
+
+                                                        SizedBox(width: 10,),
+
+                                                        Text("BPM",
+                                                        style: TextStyle(fontSize: 14),)
+                                    ],
+                                  ),);
                               },);
                             },
                           ),
+
+                          SizedBox(height: 20,),
+
+
+                                                    ListTile(
+                            leading: Icon(Icons.airline_seat_legroom_normal_rounded,size: 40,),
+                            title: Text("Kick Count : 0"),
+                            subtitle: Text("Tap to Increase the Count "),
+                            iconColor: PrimaryColor,
+                            shape: OutlineInputBorder(borderSide: BorderSide(
+                              color: Colors.grey
+                            )),
+
+                            onTap: () {
+
+                            },
+                          ),
+
+
+
 
                           
 

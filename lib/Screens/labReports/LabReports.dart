@@ -1,7 +1,9 @@
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Screens/labReports/Scan/HemoglobinScan.dart';
+import 'package:allolab/Screens/labReports/Tests/FetalMonitoring.dart';
 import 'package:allolab/Screens/labReports/Tests/Glucose.dart';
 import 'package:allolab/Screens/labReports/Tests/Hemoglobin.dart';
+import 'package:allolab/Screens/labReports/Tests/UltraSound.dart';
 import 'package:allolab/Screens/labReports/Tests/Urine.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
@@ -13,8 +15,8 @@ class LabReports extends StatelessWidget {
   LabreportOptions("Hemoglobin Test",Hemoglobin(),"hemoglobin.png"),
   LabreportOptions("Urine Test",Urine(),"urinetest.png"),
   LabreportOptions("Glucose Test",Glucose(),"glucose.png"),
-  LabreportOptions("Fetal Monitoring",Hemoglobin(),"fetalmon.png"),
-  LabreportOptions("UltraSound Test",Hemoglobin(),"ultrasound.png")
+  LabreportOptions("Fetal Monitoring",Fetalmonitoring(),"fetalmon.png"),
+  LabreportOptions("UltraSound Test",Ultrasound(),"ultrasound.png")
   ];
 
   @override

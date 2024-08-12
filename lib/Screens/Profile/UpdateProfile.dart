@@ -295,43 +295,28 @@ class UpdateProfile extends StatelessWidget {
                     //     }
                     //   },
                     // ),
-                    SizedBox(height: 10),
-Text(
-                            "Pregnant Status".tr,
-                            style: TextStyle(fontSize: 13),
-                          ),
-      
+
                           SizedBox(
-                            height: 10,
+                            height: 20,
                           ),
                         
                           SizedBox(
                             height: 60,
                             child: Ddown(
+                              label: "Pregnant Status",
                               ssItem: true,
                               validator: (value) {
-                                // if (patientDetailsController
-                                //     .pregnantStatus.isEmpty) {
-                                //   return 'Select Pregnant Status';
-                                // }
-                                // return null;
+        
                               },
                               itemz: [
                                 "YES",
                                 "NO",
                               ],
                               sItem: "",
-                              // patientDetailsController
-                              //         .pregnantStatus.isEmpty
-                              //     ? ""
-                              //     : patientDetailsController.pregnantStatus,
+    
                               mHeight: 120,
                               oChanged: (value) {
-                                // patientDetailsController.pregnantStatus =
-                                //     value!.toString();
-
-                                // patientDetailsController
-                                //     .showPreganentFields(value.toString());
+                    
                               },
                             ),
                           ),

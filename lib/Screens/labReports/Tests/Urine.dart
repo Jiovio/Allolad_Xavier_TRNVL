@@ -1,8 +1,11 @@
 
+import 'package:allolab/Components/CameraCapture.dart';
+import 'package:allolab/Components/form.dart';
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:get/route_manager.dart';
 
 class Urine extends StatelessWidget {
   const Urine({super.key});
@@ -76,14 +79,6 @@ class Urine extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: 
-                        // controller.fileImage64 == null
-                        //     ? Center(
-                        //         child: Text(
-                        //         "Click Add Image Button",
-                        //         style: TextStyle(fontSize: 18),
-                        //       ))
-                        //     : Image.memory(
-                        //         base64Decode(controller.fileImage64)),
                               const Center(
                                 child: Text(
                                 "Click Add Image Button",
@@ -98,64 +93,76 @@ class Urine extends StatelessWidget {
               ),
 
 
-                          TextButton.icon(
-                  onPressed: () => showModalBottomSheet(
-                      context: context,
-                      builder: (context) => Container(
-                            height: MediaQuery.of(context).size.height / 5,
-                            color: White,
-                            padding: EdgeInsets.only(top: 18.0, bottom: 18.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Choose photo from :",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 18),
+                          Row(
+                            children: [
+                              TextButton.icon(
+                                                onPressed: () => showModalBottomSheet(
+                                                    context: context,
+                                                    builder: (context) => Container(
+                                height: MediaQuery.of(context).size.height / 5,
+                                color: White,
+                                padding: EdgeInsets.only(top: 18.0, bottom: 18.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Choose photo from :",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 18),
+                                    ),
+                                    FloatingActionButton(
+                                        elevation: 0,
+                                        tooltip: "Camera",
+                                        onPressed: () => {},
+                                            // reportController.getImageFromCamera(),
+                                        backgroundColor: Colors.amberAccent,
+                                        child: Image.asset(
+                                          'assets/camera.png',
+                                          scale: 16,
+                                        )),
+                                    FloatingActionButton(
+                                        elevation: 0,
+                                        focusColor: Colors.greenAccent,
+                                        tooltip: "Gallery",
+                                        onPressed: () => {},
+                                            // reportController.getImageFromGallery(),
+                                        backgroundColor: Colors.indigoAccent,
+                                        child: Image.asset(
+                                          'assets/gallery.png',
+                                          scale: 16,
+                                        )),
+                                  ],
                                 ),
-                                FloatingActionButton(
-                                    elevation: 0,
-                                    tooltip: "Camera",
-                                    onPressed: () => {},
-                                        // reportController.getImageFromCamera(),
-                                    backgroundColor: Colors.amberAccent,
-                                    child: Image.asset(
-                                      'assets/camera.png',
-                                      scale: 16,
-                                    )),
-                                FloatingActionButton(
-                                    elevation: 0,
-                                    focusColor: Colors.greenAccent,
-                                    tooltip: "Gallery",
-                                    onPressed: () => {},
-                                        // reportController.getImageFromGallery(),
-                                    backgroundColor: Colors.indigoAccent,
-                                    child: Image.asset(
-                                      'assets/gallery.png',
-                                      scale: 16,
-                                    )),
-                              ],
-                            ),
-                          )),
-                  icon: Icon(Icons.add_a_photo),
-                  label: Text("Upload Report")),
+                              )),
+                                                icon: Icon(Icons.add_a_photo),
+                                                label: Text("Upload Report")),
+
+
+                                       TextButton.icon(onPressed: (){
+                                            Get.to(CameraCapture());
+                                         }, 
+                                         icon: Icon(Icons.account_tree_sharp),
+                                         label: Text("Automatic"),) 
+                            ],
+                          ),
 
                                 SizedBox(
                 height: 10.0,
               ),
 
-                          // searchBox("Report of ?",["Mother", "Child"]),
+                          dropDown("Alpamine Present", ["Yes", "No"]),
 
-                          TFField(label: "Alpamine Value",),
+                         
 
                                                      SizedBox(
                 height: 20.0,
               ),
 
+                          dropDown("Sugar Present", ["Yes","No"]),
 
-                          TFField(label: "Sugar Value",),
+
 
 
 
@@ -170,20 +177,20 @@ class Urine extends StatelessWidget {
                 height: 10.0,
               ),
 
-                            TextFormField(
-                // controller: reportController.reportDesc,
-                decoration: InputDecoration(
-                    labelText: "Write Description",
-                    border: OutlineInputBorder()),
-                keyboardType: TextInputType.text,
-                maxLines: 5,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter Description';
-                  }
-                  return null;
-                },
-              ),
+              //               TextFormField(
+              //   // controller: reportController.reportDesc,
+              //   decoration: InputDecoration(
+              //       labelText: "Write Description",
+              //       border: OutlineInputBorder()),
+              //   keyboardType: TextInputType.text,
+              //   maxLines: 5,
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter Description';
+              //     }
+              //     return null;
+              //   },
+              // ),
 
               const SizedBox(
                 height: 20.0,

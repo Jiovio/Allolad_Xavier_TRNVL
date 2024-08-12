@@ -1,20 +1,19 @@
 
+import 'package:allolab/Components/form.dart';
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
-import 'package:allolab/Screens/labReports/Scan/HemoglobinScan.dart';
-import 'package:allolab/Screens/labReports/Widgets/hemoglobinSelector.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:get/route_manager.dart';
+import 'package:numberpicker/numberpicker.dart';
 
-class Hemoglobin extends StatelessWidget {
-  const Hemoglobin({super.key});
+class Ultrasound extends StatelessWidget {
+  const Ultrasound({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Hemoglobin Report"),
+        title: Text("Ultra Sound "),
       ),
 
       body: SingleChildScrollView(
@@ -79,14 +78,6 @@ class Hemoglobin extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: 
-                        // controller.fileImage64 == null
-                        //     ? Center(
-                        //         child: Text(
-                        //         "Click Add Image Button",
-                        //         style: TextStyle(fontSize: 18),
-                        //       ))
-                        //     : Image.memory(
-                        //         base64Decode(controller.fileImage64)),
                               const Center(
                                 child: Text(
                                 "Click Add Image Button",
@@ -147,26 +138,36 @@ class Hemoglobin extends StatelessWidget {
                                                 icon: Icon(Icons.add_a_photo),
                                                 label: Text("Upload Report")),
 
-                                         TextButton.icon(onPressed: (){
-                                          Get.to(Hemoglobinscan());
+
+                                       TextButton.icon(onPressed: (){
+                                          
                                          }, 
                                          icon: Icon(Icons.account_tree_sharp),
-                                         label: Text("Automatic"),)       
+                                         label: Text("Automatic"),) 
                             ],
                           ),
-
-
 
                                 SizedBox(
                 height: 10.0,
               ),
 
-                          // searchBox("Report of ?",["Mother", "Child"]),
+                          dropDown("Fetal Movement", ["Cephalic", "Breech","Shoulder","Compound"]),
+
+                                                     SizedBox(
+                height: 20.0,
+              ),
+
+                          dropDown("Placenta", 
+                          ["Posterior","Anterior","Fundal","Lateral","Low-lying"]),
+
+                           SizedBox(
+                height: 20.0,
+              ),
 
 
-                          ListTile(
-                            leading: Image.asset("assets/labReports/hemoglobin.png"),
-                            title: Text("Hemoglobin Value : 12"),
+                                        ListTile(
+                            leading: Image.asset("assets/labReports/heart.png"),
+                            title: Text("Heart Rate : 60 BPM"),
                             subtitle: Text("Tap to Change "),
                             shape: OutlineInputBorder(borderSide: BorderSide(
                               color: Colors.grey
@@ -175,32 +176,52 @@ class Hemoglobin extends StatelessWidget {
                             onTap: () {
                               showDialog(context: context, builder:(context) {
                                 return AlertDialog(
-                                  title: Text("Hemogolin Value"),
+                                  title: Text("Heart Rate "),
 
-                                  content: HemoglobinSelector());
+                                  content: Row(
+                                    children: [
+                                      NumberPicker(
+                                                      
+                                            value: 40,
+                                                          minValue: 30,
+                                                          itemHeight: 32,
+                                                          maxValue: 150,
+                                                          onChanged: (value) {
+                                                          
+                                                          },
+                                                        ),
+
+                                                        SizedBox(width: 10,),
+
+                                                        Text("BPM",
+                                                        style: TextStyle(fontSize: 14),)
+                                    ],
+                                  ),);
                               },);
                             },
                           ),
 
-                          
 
 
 
-                        // TextFormField(
-                        //   decoration: InputDecoration(
-                        //     labelText: "Hemoglobin Value",
-                            
-                        //   ),
-                        // ),
-
-
-
-                           SizedBox(
+                                           SizedBox(
                 height: 10.0,
               ),
 
-
-
+              //               TextFormField(
+              //   // controller: reportController.reportDesc,
+              //   decoration: InputDecoration(
+              //       labelText: "Write Description",
+              //       border: OutlineInputBorder()),
+              //   keyboardType: TextInputType.text,
+              //   maxLines: 5,
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Please enter Description';
+              //     }
+              //     return null;
+              //   },
+              // ),
 
               const SizedBox(
                 height: 20.0,
