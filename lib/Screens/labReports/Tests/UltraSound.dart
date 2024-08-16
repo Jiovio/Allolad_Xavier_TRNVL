@@ -4,6 +4,7 @@ import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/services.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class Ultrasound extends StatelessWidget {
@@ -147,11 +148,14 @@ class Ultrasound extends StatelessWidget {
                             ],
                           ),
 
+                          dropDown("Fetal Movement ", ["Present","Absent"]),
+
+
                                 SizedBox(
-                height: 10.0,
+                height: 20.0,
               ),
 
-                          dropDown("Fetal Movement", ["Cephalic", "Breech","Shoulder","Compound"]),
+                          dropDown("Fetal Presentation", ["Cephalic", "Breech","Shoulder","Compound"]),
 
                                                      SizedBox(
                 height: 20.0,
@@ -224,6 +228,12 @@ class Ultrasound extends StatelessWidget {
               // ),
 
               const SizedBox(
+                height: 20.0,
+              ),
+
+              TFField(label: "Description",mLines: 5,),
+
+               const SizedBox(
                 height: 20.0,
               ),
 

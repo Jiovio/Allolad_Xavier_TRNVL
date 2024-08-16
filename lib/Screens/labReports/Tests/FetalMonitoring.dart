@@ -246,6 +246,12 @@ class Fetalmonitoring extends StatelessWidget {
                 height: 20.0,
               ),
 
+                            TFField(label: "Description",mLines: 5,),
+
+               const SizedBox(
+                height: 20.0,
+              ),
+
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       minimumSize: Size(300, 50),

@@ -199,6 +199,9 @@ class Hemoglobin extends StatelessWidget {
                 height: 10.0,
               ),
 
+                            TFField(label: "Description",mLines: 5,),
+
+
 
 
 

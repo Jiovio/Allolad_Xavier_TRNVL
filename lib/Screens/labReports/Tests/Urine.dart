@@ -192,9 +192,12 @@ class Urine extends StatelessWidget {
               //   },
               // ),
 
-              const SizedBox(
+                            TFField(label: "Description",mLines: 5,),
+
+               const SizedBox(
                 height: 20.0,
               ),
+
 
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
