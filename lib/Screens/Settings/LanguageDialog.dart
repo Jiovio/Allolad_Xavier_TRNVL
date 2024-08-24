@@ -1,12 +1,15 @@
 
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/intl/Translation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 languageSelectDialog(BuildContext context) {
+  final Usercontroller usercontroller = Get.put(Usercontroller());
   return showDialog(
+      
       builder: (BuildContext context) => AlertDialog(
           contentPadding: EdgeInsets.only(top: 8.0, bottom: 16.0),
           insetPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
@@ -27,28 +30,37 @@ languageSelectDialog(BuildContext context) {
                     ),
                   ),
                   trailing: 
+
+                  
+                  GetBuilder<Usercontroller>(
+                    // init: Usercontroller(),
+                    builder:(controller) => 
                       Radio(
                             activeColor: PrimaryColor,
                             value: TranslationService.langs[index],
-                            groupValue: "English",
+                            groupValue: controller.locale,
                             onChanged: (val) {
-                              // TranslationService().changeLocale(val.toString());
+                              TranslationService().changeLocale(val.toString());
+                              controller.locale = val!;
+                              // print(controller.locale);
+
+                              controller.update();
                               // data.write(
                               //     'lang',
                               //     TranslationService()
                               //         .getLocaleFromLanguage(val.toString())
                               //         .toString());
-                              // Fluttertoast.showToast(
-                              //     msg: "Language Changed to $val",
-                              //     toastLength: Toast.LENGTH_SHORT,
-                              //     gravity: ToastGravity.BOTTOM,
-                              //     backgroundColor: Colors.black54,
-                              //     textColor: Colors.white,
-                              //     fontSize: 16.0);
+                              Fluttertoast.showToast(
+                                  msg: "Language Changed to $val",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  backgroundColor: Colors.black54,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
                               // controller.onSelectLang(val);
-                              // Navigator.pop(context);
+                              Navigator.pop(context);
                             },
-                          )),
+                          ))),
             ),
           
           )),

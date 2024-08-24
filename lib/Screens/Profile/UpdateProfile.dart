@@ -2,6 +2,7 @@ import 'package:allolab/Components/dropdown.dart';
 import 'package:allolab/Components/form.dart';
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ class UpdateProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
+
     return Scaffold(
                 appBar: AppBar(
             title: Text("Edit Profile".tr),

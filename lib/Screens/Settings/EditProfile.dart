@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +12,13 @@ class EditProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Usercontroller userController = Get.put(Usercontroller());
+
+
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Profile".tr),
+        title: Text("My Profile".tr),
         actions: [
           IconButton(
               icon: Icon(Icons.check),
@@ -175,7 +180,7 @@ class EditProfile extends StatelessWidget {
                   height: 16.0,
                 ),
                 TextFormField(
-                  // controller: settingsController.name,
+                  controller: userController.name,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter Name'.tr;
@@ -192,20 +197,24 @@ class EditProfile extends StatelessWidget {
                   children: [
                     Flexible(
                       child: DropdownSearch<String>(
+
+                        dropdownDecoratorProps: DropDownDecoratorProps(dropdownSearchDecoration: InputDecoration(
+                          labelText: "Gender".tr
+                        )),
                         
 
                         validator: (v) =>
                             v == null ? "Please Select Gender".tr : null,
 
                         popupProps: PopupProps.menu(
-showSelectedItems: true
+                          constraints: BoxConstraints(maxHeight: 120),
+                          
+                          showSelectedItems: true
                         ),
-                        // selectedItem: settingsController.gender,
+                        selectedItem: userController.gender,
                         items: ["Male", "Female"],
-                        // label: "Gender".tr,
-                        // maxHeight: 120,
                         onChanged: (value) {
-                          // settingsController.gender = value!;
+                          userController.gender = value!;
                         },
                       ),
                     ),
@@ -214,7 +223,7 @@ showSelectedItems: true
                     ),
                     Flexible(
                       child: TextFormField(
-                        // controller: settingsController.age,
+                        controller: userController.age,
                         onTap: () {},
                         decoration: InputDecoration(
                             labelText: "Age".tr, border: OutlineInputBorder()),
@@ -235,7 +244,10 @@ showSelectedItems: true
                 Container(
                   height: 60.0,
                   child: DropdownSearch<String>(
-                    // selectedItem: settingsController.yearOfExperience,
+                    dropdownDecoratorProps: DropDownDecoratorProps(dropdownSearchDecoration: InputDecoration(
+                      labelText: "Year of Experience".tr,
+                    )),
+                    selectedItem: userController.yearOfExperience,
                     validator: (v) =>
                         v == null ? "Select Years of experience".tr : null,
                     popupProps: PopupProps.menu(
@@ -243,9 +255,8 @@ showSelectedItems: true
                     ),
                     // showSelectedItem: true,
                     items: yoe,
-                    // label: "Year of Experience".tr,
                     onChanged: (value) {
-                      // settingsController.yearOfExperience = value!;
+                      userController.yearOfExperience = value!;
                     },
                   ),
                 ),
@@ -253,7 +264,7 @@ showSelectedItems: true
                   height: 12.0,
                 ),
                 TextFormField(
-                  // controller: settingsController.title,
+                  controller: userController.title,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter Title'.tr;
@@ -277,7 +288,7 @@ showSelectedItems: true
                   height: 16.0,
                 ),
                 TextFormField(
-                  // controller: settingsController.address,
+                  controller: userController.address,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter some text'.tr;
@@ -292,7 +303,7 @@ showSelectedItems: true
                   height: 12.0,
                 ),
                 TextFormField(
-                  // controller: settingsController.pinCode,
+                  controller: userController.pincode,
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {

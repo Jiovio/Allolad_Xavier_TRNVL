@@ -1,10 +1,13 @@
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/AuthController.dart';
 import 'package:allolab/Screens/Main/MainScreen.dart';
 import 'package:allolab/Screens/Settings/LanguageDialog.dart';
+import 'package:allolab/intl/Translation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/route_manager.dart';
 import 'package:get/utils.dart';
+import 'package:get/get.dart';
 
 class Signinview extends StatefulWidget {
   const Signinview({super.key});
@@ -17,8 +20,16 @@ class _SigninviewState extends State<Signinview> {
 
   bool loading = false;
 
+  bool viewPassword = true;
+
+  final _formKey = GlobalKey<FormState>();
+
+
   @override
   Widget build(BuildContext context) {
+
+      final Authcontroller authcontroller = Get.put(Authcontroller());
+
        return Container(
       color: PrimaryColor,
       child: SafeArea(
@@ -54,7 +65,7 @@ class _SigninviewState extends State<Signinview> {
                                   'Helps you to consult patient Virtually'.tr,
                                   style: TextStyle(
                                       color: darkGrey3,
-                                      fontSize: 22,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.center,
                                 ))
@@ -138,14 +149,14 @@ class _SigninviewState extends State<Signinview> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Form(
-                          // key: _formKey,
+                          key: _formKey,
                           child: Column(
                             children: [
                               TextFormField(
                                 decoration: InputDecoration(
                                     labelText: "Username".tr,
                                     border: UnderlineInputBorder()),
-                                // controller: googleSignInController.username,
+                                controller: authcontroller.username,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter Username'.tr;
@@ -154,21 +165,22 @@ class _SigninviewState extends State<Signinview> {
                                 },
                               ),
                               TextFormField(
-                                // obscureText: !viewPassword,
+                                obscureText: !viewPassword,
                                 decoration: InputDecoration(
+
                                     suffixIcon: IconButton(
                                         splashRadius: 18.0,
                                         onPressed: () {
-                                          // setState(() {
-                                          //   viewPassword =
-                                          //       viewPassword ? false : true;
-                                          // });
+                                          setState(() {
+                                            viewPassword =
+                                                viewPassword ? false : true;
+                                          });
                                         },
                                         iconSize: 22,
                                         icon: const Icon(Icons.visibility_off)),
                                     labelText: "password".tr,
                                     border: UnderlineInputBorder()),
-                                // controller: googleSignInController.password,
+                                controller: authcontroller.password,
                                 keyboardType: TextInputType.visiblePassword,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -195,24 +207,18 @@ class _SigninviewState extends State<Signinview> {
                             : ElevatedButton(
                                 onPressed: () {
 
-                                  Get.to(()=>MainScreen(),transition: Transition.cupertino);
+                                  // Get.to(()=>MainScreen(),transition: Transition.cupertino);
 
 
-                                  // if (_formKey.currentState!.validate()) {
-                                  //   // if( googleSignInController.username.text.isEmail){
-                                  //   googleSignInController.googleSignIn();
-                                  //   // }else {
-                                  //   //   Get.snackbar(
-                                  //   //       'EMail ID is invalid',
-                                  //   //       'Please enter correct email id',
-                                  //   //       snackPosition: SnackPosition.BOTTOM
-                                  //   //   );
-                                  //   // }
-                                  // } else {
-                                  //   Get.snackbar('All fields',
-                                  //       'Fields are empty. please enter all fields.',
-                                  //       snackPosition: SnackPosition.BOTTOM);
-                                  // }
+                                  if (_formKey.currentState!.validate()) {
+
+                                    authcontroller.login();
+
+                                  } else {
+                                    Get.snackbar('All fields',
+                                        'Fields are empty. please enter all fields.',
+                                        snackPosition: SnackPosition.BOTTOM);
+                                  }
                                 },
                                 style: ElevatedButton.styleFrom(
                                     minimumSize: Size(350, 50),
