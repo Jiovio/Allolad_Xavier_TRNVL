@@ -1,9 +1,13 @@
 
+import 'dart:convert';
+
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/Reports/glucoseController.dart';
 import 'package:allolab/Screens/Screening/Vitals/BloodGlucose.dart';
+import 'package:allolab/Screens/labReports/Widgets/selectorWidgets.dart';
 import 'package:flutter/material.dart';
-import 'package:dropdown_search/dropdown_search.dart';
+import 'package:get/get.dart';
 
 class Glucose extends StatelessWidget {
   const Glucose({super.key});
@@ -18,7 +22,11 @@ class Glucose extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
+          child: 
+          GetBuilder<Glucosecontroller>(
+            init: Glucosecontroller(),
+            builder:(controller) => 
+          Column(
 
             children: [
 
@@ -34,22 +42,18 @@ class Glucose extends StatelessWidget {
                                 child: Stack(
                                   children: [
                                     InteractiveViewer(
-                                      child:const Center(
+                                      child: Center(
                                         child: 
-                                        // controller.fileImage64 == null
-                                        //     ? Text(
-                                        //         "NO IMAGE",
-                                        //         style: TextStyle(
-                                        //             fontSize: 18, color: White),
-                                        //       )
-                                        //     : Image.memory(base64Decode(
-                                        //         controller.fileImage64)),
-
-                                              Text(
+                                        controller.fileImage64 == null
+                                            ? Text(
                                                 "NO IMAGE",
                                                 style: TextStyle(
                                                     fontSize: 18, color: White),
                                               )
+                                            : Image.memory(base64Decode(
+                                                controller.fileImage64)),
+
+
                                                 
                                       ),
                                     ),
@@ -77,11 +81,14 @@ class Glucose extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: 
-                              const Center(
+                            controller.fileImage64 == null
+                            ? Center(
                                 child: Text(
                                 "Click Add Image Button",
                                 style: TextStyle(fontSize: 18),
                               ))
+                            : Image.memory(
+                                base64Decode(controller.fileImage64)),
 
                       ),
               ),
@@ -111,8 +118,8 @@ class Glucose extends StatelessWidget {
                                 FloatingActionButton(
                                     elevation: 0,
                                     tooltip: "Camera",
-                                    onPressed: () => {},
-                                        // reportController.getImageFromCamera(),
+                                    onPressed: () => 
+                                        controller.getImageFromCamera(),
                                     backgroundColor: Colors.amberAccent,
                                     child: Image.asset(
                                       'assets/camera.png',
@@ -122,8 +129,8 @@ class Glucose extends StatelessWidget {
                                     elevation: 0,
                                     focusColor: Colors.greenAccent,
                                     tooltip: "Gallery",
-                                    onPressed: () => {},
-                                        // reportController.getImageFromGallery(),
+                                    onPressed: () => 
+                                        controller.getImageFromGallery(),
                                     backgroundColor: Colors.indigoAccent,
                                     child: Image.asset(
                                       'assets/gallery.png',
@@ -154,7 +161,7 @@ class Glucose extends StatelessWidget {
 
                           ListTile(
                             leading: Image.asset("assets/labReports/hemoglobin.png"),
-                            title: Text("Blood Glucose Value : 12"),
+                            title: Text("Blood Glucose Value : ${controller.glucoseValue.toString()}"),
                             subtitle: Text("Tap to Change "),
                             shape: OutlineInputBorder(borderSide: BorderSide(
                               color: Colors.grey
@@ -165,7 +172,7 @@ class Glucose extends StatelessWidget {
                                 return AlertDialog(
                                   title: Text("Blood Glucose Value"),
 
-                                  content: BloodGlucose());
+                                  content: glucoseSelector());
                               },);
                             },
                           ),
@@ -174,7 +181,7 @@ class Glucose extends StatelessWidget {
                 height: 20.0,
               ),
 
-                            TFField(label: "Description",mLines: 5,),
+                            TFField(label: "Description",mLines: 5,txtController: controller.desc,),
 
                const SizedBox(
                 height: 20.0,
@@ -185,7 +192,7 @@ class Glucose extends StatelessWidget {
                       minimumSize: Size(300, 50),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40))),
-                  onPressed: () => {},
+                  onPressed: controller.submit,
                   child: Text("ADD REPORT"))
 
 
@@ -195,6 +202,8 @@ class Glucose extends StatelessWidget {
 
             ],
           ),
+          )
+          
           )
         ),
 

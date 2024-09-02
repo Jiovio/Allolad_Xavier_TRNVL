@@ -259,7 +259,10 @@ class UpdateProfile extends StatelessWidget {
                     ),
                     Container(
                       height: 60.0,
-                      child: dropDown("Blood Group", BG)
+                      child: dropDown("Blood Group", BG,
+                      (text) {
+                              
+                            })
                       // DropdownSearch<String>(
 
                       //   popupProps: PopupProps.menu(
@@ -279,7 +282,10 @@ class UpdateProfile extends StatelessWidget {
                       height: 12.0,
                     ),
 
-                      dropDown("Gender", ["Male".tr, "Female".tr])
+                      dropDown("Gender", ["Male".tr, "Female".tr],
+                      (text) {
+                              
+                            })
                     ,
                     // DropdownSearch<String>(
                     //   mode: Mode.MENU,

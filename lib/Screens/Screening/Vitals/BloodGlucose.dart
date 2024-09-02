@@ -7,8 +7,6 @@ Wrap BloodGlucose() {
   return Wrap(
     crossAxisAlignment: WrapCrossAlignment.start,
     children: [
-      Column(
-        children: [
              Column(
               children: [
                 Row(
@@ -75,8 +73,7 @@ Wrap BloodGlucose() {
               ],
             )
           ,
-        ],
-      ),
+ 
     ],
   );
 }

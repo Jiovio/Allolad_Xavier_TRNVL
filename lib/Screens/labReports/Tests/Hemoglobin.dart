@@ -1,14 +1,23 @@
 
+import 'dart:convert';
+
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/Reports/hemoglobinController.dart';
+import 'package:allolab/Controller/global/InternetController.dart';
 import 'package:allolab/Screens/labReports/Scan/HemoglobinScan.dart';
-import 'package:allolab/Screens/labReports/Widgets/hemoglobinSelector.dart';
+import 'package:allolab/Screens/labReports/Widgets/selectorWidgets.dart';
+import 'package:allolab/db/dbHelper.dart';
+import 'package:allolab/temp/ReportListPage.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 
 class Hemoglobin extends StatelessWidget {
-  const Hemoglobin({super.key});
+   Hemoglobin({super.key});
+
+  // Internetcontroller ic = Get.put(Internetcontroller());
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +26,23 @@ class Hemoglobin extends StatelessWidget {
         title: Text("Add Hemoglobin Report"),
       ),
 
+      floatingActionButton: FloatingActionButton(onPressed: (){
+        getReports();
+
+        // Get.to(ReportListPage());
+        
+        },
+        // child: Obx(()=>Text(ic.isOnline.value?"Yes":"No"))
+        
+        ),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
+          child: GetBuilder<Hemoglobincontroller>(
+                              init: Hemoglobincontroller(),
+                              builder:(controller) => 
+                              Column(
 
             children: [
 
@@ -36,22 +58,23 @@ class Hemoglobin extends StatelessWidget {
                                 child: Stack(
                                   children: [
                                     InteractiveViewer(
-                                      child:const Center(
+                                      child:Center(
                                         child: 
-                                        // controller.fileImage64 == null
-                                        //     ? Text(
-                                        //         "NO IMAGE",
-                                        //         style: TextStyle(
-                                        //             fontSize: 18, color: White),
-                                        //       )
-                                        //     : Image.memory(base64Decode(
-                                        //         controller.fileImage64)),
-
-                                              Text(
+                                        
+                                        controller.fileImage64 == null
+                                            ? Text(
                                                 "NO IMAGE",
                                                 style: TextStyle(
                                                     fontSize: 18, color: White),
                                               )
+                                            : Image.memory(base64Decode(
+                                                controller.fileImage64)),
+
+                                              // Text(
+                                              //   "NO IMAGE",
+                                              //   style: TextStyle(
+                                              //       fontSize: 18, color: White),
+                                              // )
                                                 
                                       ),
                                     ),
@@ -79,20 +102,14 @@ class Hemoglobin extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: 
-                        // controller.fileImage64 == null
-                        //     ? Center(
-                        //         child: Text(
-                        //         "Click Add Image Button",
-                        //         style: TextStyle(fontSize: 18),
-                        //       ))
-                        //     : Image.memory(
-                        //         base64Decode(controller.fileImage64)),
-                              const Center(
+                        controller.fileImage64 == null
+                            ? Center(
                                 child: Text(
                                 "Click Add Image Button",
                                 style: TextStyle(fontSize: 18),
                               ))
-
+                            : Image.memory(
+                                base64Decode(controller.fileImage64)),
                       ),
               ),
 
@@ -123,8 +140,8 @@ class Hemoglobin extends StatelessWidget {
                                     FloatingActionButton(
                                         elevation: 0,
                                         tooltip: "Camera",
-                                        onPressed: () => {},
-                                            // reportController.getImageFromCamera(),
+                                        onPressed: () =>
+                                            controller.getImageFromCamera(),
                                         backgroundColor: Colors.amberAccent,
                                         child: Image.asset(
                                           'assets/camera.png',
@@ -134,8 +151,8 @@ class Hemoglobin extends StatelessWidget {
                                         elevation: 0,
                                         focusColor: Colors.greenAccent,
                                         tooltip: "Gallery",
-                                        onPressed: () => {},
-                                            // reportController.getImageFromGallery(),
+                                        onPressed: () => 
+                                            controller.getImageFromGallery(),
                                         backgroundColor: Colors.indigoAccent,
                                         child: Image.asset(
                                           'assets/gallery.png',
@@ -166,7 +183,12 @@ class Hemoglobin extends StatelessWidget {
 
                           ListTile(
                             leading: Image.asset("assets/labReports/hemoglobin.png"),
-                            title: Text("Hemoglobin Value : 12"),
+                            title: 
+                            Text("Hemoglobin Value : ${controller.hemoGlobinValue}",
+                            ),
+                            
+                            
+                            
                             subtitle: Text("Tap to Change "),
                             shape: OutlineInputBorder(borderSide: BorderSide(
                               color: Colors.grey
@@ -199,7 +221,8 @@ class Hemoglobin extends StatelessWidget {
                 height: 10.0,
               ),
 
-                            TFField(label: "Description",mLines: 5,),
+                            TFField(label: "Description",mLines: 5,
+                            txtController: controller.desc,),
 
 
 
@@ -214,7 +237,7 @@ class Hemoglobin extends StatelessWidget {
                       minimumSize: Size(300, 50),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40))),
-                  onPressed: () => {},
+                  onPressed: controller.submit,
                   child: Text("ADD REPORT"))
 
 
@@ -224,7 +247,7 @@ class Hemoglobin extends StatelessWidget {
 
             ],
           ),
-          )
+          )),
         ),
 
     );

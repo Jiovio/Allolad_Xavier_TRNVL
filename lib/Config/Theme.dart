@@ -5,7 +5,6 @@ import 'Color.dart';
 class Themes {
     final lightTheme = ThemeData.light().copyWith(
 
-
           elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: PrimaryColor,
