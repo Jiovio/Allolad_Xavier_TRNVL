@@ -26,15 +26,15 @@ class LabReports extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed:() async {
+      // floatingActionButton: FloatingActionButton(onPressed:() async {
 
-        Database db = await Sqlite.db();
-      List<Map<String,dynamic>> d = await  db.query("my_table");
+      //   Database db = await Sqlite.db();
+      // List<Map<String,dynamic>> d = await  db.query("my_table");
 
-      print(d);
+      // print(d);
 
         
-      },),
+      // },),
       appBar: AppBar(
         title: Text("Lab Reports"),
       ),
