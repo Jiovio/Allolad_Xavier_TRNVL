@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:allolab/API/apiroutes.dart';
 import 'package:allolab/db/sqlite.dart';
 import 'package:allolab/temp/ReportListPage.dart';
 import 'package:crypto/crypto.dart';
@@ -49,4 +50,41 @@ getReports() async {
   // print("Hii");
   Get.to(ReportListPage(),arguments: d);
   // return d;
+}
+
+void addPatientToHistory(patient) async {
+Database db = await Sqlite.db();
+
+
+List<Map<String, Object?>> d = await db.query("patients",where: "uid = ?",whereArgs: [patient["id"]]);
+
+
+if(d.isNotEmpty){
+  return;
+}
+
+var hid = Apiroutes.getHealthWorkerID();
+
+print(patient);
+
+var data = {
+  "hid":hid,
+      "uid": patient["id"],
+      "name": patient["name"],
+      "gender": patient["gender"],
+      "phone": patient["phone_number"],
+      "age": patient["age:"],
+};
+
+int aid = await db.insert("patients",data );
+
+print(aid);
+
+
+}
+
+Future<List<Map<String, dynamic>>> getLocalPatients() async {
+  Database db = await Sqlite.db();
+  var d = await db.query("patients");
+  return d;
 }

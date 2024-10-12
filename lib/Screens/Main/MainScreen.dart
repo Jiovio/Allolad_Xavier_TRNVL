@@ -1,21 +1,25 @@
+import 'package:allolab/API/Requests/Userapi.dart';
 import 'package:allolab/Components/bottom_nav_bar.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/Screens/Sync/SyncUI.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/route_manager.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class MainScreen extends StatelessWidget {
+  MainScreen({super.key});
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
 
-class _MainScreenState extends State<MainScreen> {
+  Usercontroller controller = Get.put(Usercontroller());
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return 
+    Obx(()=>
+    controller.loading.value ? Scaffold(body: Center(child: CircularProgressIndicator())):
+    Scaffold(
 
       bottomNavigationBar: bottomNavigationBar(),
 
@@ -41,10 +45,11 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
               onPressed: () => 
-                  Get.to(() => Sync(), transition: Transition.rightToLeft),
+              controller.initScreen(),
+                  // Get.to(() => Sync(), transition: Transition.rightToLeft),
             ),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerDocked,
-    );
+    ));
   }
 }

@@ -1,89 +1,139 @@
+
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/PatientsController.dart';
+import 'package:allolab/Screens/Patient/ViewReport.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Report extends StatelessWidget {
-  const Report({super.key});
+  int id;
+   Report({super.key, required this.id});
+
+
+   Patientscontroller controller = Get.put(Patientscontroller());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
- appBar: AppBar(
-          title: Text(
-        "Report".tr,
-        style: TextStyle(color: Black),
-      )),
-
+      appBar: AppBar(title: Text("Report")),
       body: Column(
         children: [
-                    Padding(
-              padding: const EdgeInsets.only(
-                  left: 20, right: 20, top: 20, bottom: 20),
-              child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.only(
-                          left: 20, right: 40, top: 14, bottom: 14)),
-                  onPressed: () {},
-                  // Get.to(() => AddReport(),
-                      // transition: Transition.rightToLeft),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Icon(Icons.camera),
-                      Container(
-                          width: MediaQuery.of(context).size.width * .6,
-                          child:
-                              Text("Scan and Add new Report".toUpperCase().tr))
-                    ],
-                  ))),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              ),
+              onPressed: () {}, 
+              // Get.to(() => AddReport(), transition: Transition.rightToLeft),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.camera),
+                  SizedBox(width: 10),
+                  Text("Scan and Add new Report".toUpperCase())
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: controller.getReports(id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No reports found'));
+                } else {
+                  List<dynamic> reports = snapshot.data!;
 
-                // controller.reportType.length == 0
-                false
-                ? Expanded(child: Center(child: Text("No Report Added".tr)))
-                : Expanded(
-                    child: ListView.separated(
-                      padding: EdgeInsets.only(top: 20, left: 10, right: 10),
-                      separatorBuilder: (BuildContext context, int index) =>
-                          SizedBox(
-                        height: 10,
-                      ),
-                      shrinkWrap: true,
-                      itemCount: 1,
-                      itemBuilder: (BuildContext context, int index) => Card(
-                        elevation: 2,
-                        shape: Border(
-                            left: BorderSide(color: PrimaryColor, width: 4)),
-                        child: InkWell(
-                            highlightColor: accentColor.withOpacity(0.1),
-                            splashColor: accentColor.withOpacity(0.8),
-                            onTap: () {
-                              // Get.to(
-                              //     () => ReportList(
-                              //         reportType: controller.reportType[index]),
-                              //     transition: Transition.rightToLeft);
+                  return ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: reports.length,
+                    itemBuilder: (context, index) {
+                      var report = reports[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: PrimaryColor, width: 2),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () { 
+                              print(report);
+                              
+                              Get.to(
+                              () => 
+                              ViewReport(reportDetails: report),
+                              transition: Transition.rightToLeft,
+                            );
+                            
                             },
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 20, left: 10, right: 20, bottom: 20),
-                              child: Text("Report 1",
-                              // ontroller.reportType[index],
-                                  style: TextStyle(
-                                      color: Get.isDarkMode
-                                          ? Colors.grey
-                                          : PrimaryColor,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700)),
-                            )),
-                      ),
-                    ),
-                  ),
-          
-          
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      report['imageurl'],
+                                      height: 80,
+                                      width: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Container(
+                                            height: 80,
+                                            width: 80,
+                                            color: Colors.grey[300],
+                                            child: Icon(Icons.error),
+                                          ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          report['report_type'],
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          report['description'],
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
         ],
       ),
-
-
-
     );
   }
 }

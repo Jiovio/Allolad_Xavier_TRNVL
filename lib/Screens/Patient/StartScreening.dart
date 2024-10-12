@@ -1,10 +1,15 @@
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/PatientsController.dart';
 import 'package:allolab/Screens/Patient/AddPatient.dart';
+import 'package:allolab/Screens/Patient/PatientDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class StartScreening extends StatelessWidget {
-  const StartScreening({super.key});
+  StartScreening({super.key});
+
+
+  Patientscontroller controller = Get.put(Patientscontroller());
 
   @override
   Widget build(BuildContext context) {
@@ -119,11 +124,8 @@ class StartScreening extends StatelessWidget {
                                           labelText: "Enter Phone Number",
                                           border: UnderlineInputBorder()),
                                       keyboardType: TextInputType.number,
-                                      onChanged: (string) {
-                                        // peopleController
-                                        //     .filteredPeopleListWithPhoneNumber(
-                                        //         string);
-                                      },
+                                      controller: controller.phone,
+                                      onChanged: controller.findPatient,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Please enter Phone Number';
@@ -139,15 +141,13 @@ class StartScreening extends StatelessWidget {
                               ),
                             ],
                           ),
-                          false
 
-                          // GetBuilder<PeopleController>(
-                          //     builder: (controller) => controller
-                          //                 .filterPeopleListWithPhoneNumber
-                          //                 .length ==
-                          //             0
-                                  ? Container()
-                                  : Container(
+
+                          GetBuilder<Patientscontroller>(
+                            
+                            builder: (controller) {
+                              return controller.patientFound?
+                              Container(
                                       height:
                                           MediaQuery.of(context).size.height /
                                               5,
@@ -157,18 +157,14 @@ class StartScreening extends StatelessWidget {
                                             AlwaysScrollableScrollPhysics(),
                                         itemBuilder: (context, index) {
                                           return ListTile(
-                                            title: Text( "Hello"
-                                              // controller
-                                              //     .filterPeopleListWithPhoneNumber[
-                                              //         index]
-                                              //     .name,
+                                            title: Text( controller.patient["name"]
                                             ),
                                             subtitle: Row(
                                               children: [
                                                 Text("Mobile No:"),
                                                 Text(
 
-                                                  "Hello",
+                                                  controller.patient["phone_number"],
                                                   // "${controller.filterPeopleListWithPhoneNumber[index].phone}",
                                                   softWrap: true,
                                                 ),
@@ -178,14 +174,8 @@ class StartScreening extends StatelessWidget {
                                               Icons.arrow_right_outlined,
                                               color: PrimaryColor,
                                             ),
-                                            onTap: () {
-                                              // Get.to(
-                                              //     () => PeopleDetails(
-                                              //         patientDetails: controller
-                                              //                 .filterPeopleListWithPhoneNumber[
-                                              //             index]),
-                                              //     transition:
-                                              //         Transition.rightToLeft);
+                                            onTap: (){
+                                              controller.navigateToPatient(controller.patient);
                                             },
                                           );
                                         },
@@ -197,7 +187,10 @@ class StartScreening extends StatelessWidget {
                                         //     .filterPeopleListWithPhoneNumber
                                         //     .length,
                                       ),
-                                    ),
+                                    ):Container();
+                                  
+                            }, ),
+                         
                         ],
                       )),
                 ),

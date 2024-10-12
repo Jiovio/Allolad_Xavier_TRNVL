@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/PatientsController.dart';
 import 'package:allolab/Screens/Awareness/Awareness.dart';
 import 'package:allolab/Screens/Patient/Appointment.dart';
 import 'package:allolab/Screens/Patient/Checkup.dart';
@@ -14,7 +15,13 @@ import 'package:get/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class PatientDetails extends StatelessWidget {
-  const PatientDetails({super.key});
+  int id;
+  String name;
+   PatientDetails({super.key, required this.id, required this.name});
+
+   Patientscontroller controller = Get.put(Patientscontroller());
+
+   dynamic argumentData = Get.arguments;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +58,11 @@ class PatientDetails extends StatelessWidget {
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(12),
                                       splashColor: PrimaryColor,
-                                      onTap: () => 
-                                      Get.to(()=>UpdateProfile(),transition: Transition.leftToRight),
+                                      onTap: () {
+                                        // print(argumentData);
+                                        Get.to(()=>UpdateProfile(),transition: Transition.leftToRight);
+                                      } 
+                                      ,
                                       child: Padding(
                                         padding: const EdgeInsets.all(20.0),
                                         child: Container(
@@ -122,7 +132,7 @@ class PatientDetails extends StatelessWidget {
                                               ),
                                               Flexible(
                                                 child: Text(
-                                                  "Dev Patil",
+                                                  name,
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                       fontSize: 18,
@@ -229,7 +239,7 @@ class PatientDetails extends StatelessWidget {
                                               ),
                                               Flexible(
                                                 child: Text(
-                                                  "XYZAB12-24",
+                                                  id.toString(),
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                       fontSize: 18,
@@ -563,7 +573,7 @@ class PatientDetails extends StatelessWidget {
                       onTap: () {
                         // Get.to(() => Report(patientId: patientDetails.id),
                         //     transition: Transition.rightToLeft);
-                        Get.to(()=>Report(),transition: Transition.leftToRight);
+                        Get.to(()=>Report(id: id,),transition: Transition.leftToRight);
                       },
                       child: Padding(
                           padding: const EdgeInsets.all(20.0),

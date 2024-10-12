@@ -1,7 +1,9 @@
 import 'package:allolab/Components/AppBar.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/Screens/Patient/PatientDetails.dart';
 import 'package:allolab/Screens/Patient/StartScreening.dart';
+import 'package:allolab/db/dbHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -13,7 +15,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    bool emptyUser = false;
+    Usercontroller controller = Get.put(Usercontroller());
+
+    bool emptyUser = true;
 
     return Scaffold(
 
@@ -43,13 +47,13 @@ class HomeScreen extends StatelessWidget {
                               : Row(
                                   children: [
                                     Text(
-                                      "Welcome".tr,
+                                      "Welcome ".tr,
                                       style: TextStyle(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      " Lala Patil",
+                                      controller.name.text,
                                       style: TextStyle(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold),
@@ -168,7 +172,7 @@ class HomeScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(
                               left: 12.0, right: 20.0, bottom: 4),
                           child: Text(
-                            true
+                            false
                                 ? "Re-visit Patient".tr
                                 : "Recently Added Patient".tr,
                             style: TextStyle(
@@ -183,7 +187,7 @@ class HomeScreen extends StatelessWidget {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            if (true) {
+                            if (false) {
                               return ListTile(
                                 title: Text(
                                   "Sopna",
@@ -217,7 +221,7 @@ class HomeScreen extends StatelessWidget {
 
                                   
                                   Get.to(
-                                      () => PatientDetails(),
+                                      () => PatientDetails(id: 0, name: "",),
                                       transition: Transition.rightToLeft);
 
                                   // Get.to(
@@ -229,15 +233,40 @@ class HomeScreen extends StatelessWidget {
                               );
                             
                             } else {
+
+                            return  FutureBuilder<List<Map<String, dynamic>>>(
+                future: getLocalPatients(),
+                builder: (context, snapshot) {
+
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No patients found'.tr));
+                  } else {
+                    final filteredPatients = snapshot.data!;
+
+                          return ListView.separated(
+                            shrinkWrap: true,
+                        itemCount: filteredPatients.length,
+                        separatorBuilder: (context, index) => Divider(
+                          thickness: 1,
+                          color: Colors.black54,
+                          height: 0,
+                        ),
+                        itemBuilder: (context, index) {
+                          final patient = filteredPatients[index];
+
                               return ListTile(
                                 title: Text(
-                                  "Madhavan",
+                                  patient["name"],
                                 ),
                                 subtitle: Row(
                                   children: [
                                     Text("Mobile No:".tr),
                                     Text(
-                                        " 8754389567"),
+                                        patient["phone"]),
                                   ],
                                 ),
                                 trailing: Icon(
@@ -252,6 +281,10 @@ class HomeScreen extends StatelessWidget {
                                   //     transition: Transition.rightToLeft);
                                 },
                               );
+                        }
+                          );
+                  }
+                              });
                             }
                           },
                           separatorBuilder: (context, index) => Divider(),

@@ -1,5 +1,7 @@
+import 'package:allolab/API/apiroutes.dart';
 import 'package:allolab/Config/Theme.dart';
 import 'package:allolab/Controller/global/InternetController.dart';
+import 'package:allolab/Screens/Main/MainScreen.dart';
 import 'package:allolab/Screens/Signin/SigninView.dart';
 import 'package:allolab/intl/Translation.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
           fallbackLocale: TranslationService.fallbackLocale,
           translations: TranslationService(),
           theme: Themes().lightTheme,
-          home: Signinview(),
+          home:Apiroutes.checkUser() ?MainScreen():Signinview(),
         ),
     );
   }

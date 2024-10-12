@@ -3,8 +3,12 @@ import 'package:allolab/Screens/Notification/NotificationView.dart';
 import 'package:allolab/Screens/Settings/AppInfo.dart';
 import 'package:allolab/Screens/Settings/EditProfile.dart';
 import 'package:allolab/Screens/Settings/LanguageDialog.dart';
+import 'package:allolab/Screens/Signin/SigninView.dart';
+import 'package:allolab/db/sqlite.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:localstorage/localstorage.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -355,6 +359,14 @@ ListView(
                                 TextButton(
                                     child: Text('Yes'.tr),
                                     onPressed: () async {
+                                      localStorage.clear();
+                                     Database db =  await Sqlite.db();
+
+                                     db.delete("patients");
+                                     db.delete("reports");
+                                      Get.deleteAll();
+                                     Get.offAll(Signinview());
+
                                       // data.remove('token');
                                       // data.remove('hospitalName');
                                       // await deleteCacheDir();

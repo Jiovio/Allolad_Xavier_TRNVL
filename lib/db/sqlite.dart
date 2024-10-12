@@ -60,6 +60,17 @@ CREATE TABLE sync (
     );
   ''');
 
+        await db.execute('''
+    CREATE TABLE patients (
+      hid INTEGER,
+      uid INTEGER NOT NULL,
+      name TEXT,
+      gender TEXT,
+      phone TEXT,
+      age INTEGER
+    );
+  ''');
+
     // await db.execute('''
     //   insert into my_table (name) values("vijay");
     // ''');
