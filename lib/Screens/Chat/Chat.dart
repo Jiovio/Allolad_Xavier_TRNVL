@@ -1,12 +1,38 @@
+
+import 'dart:async';
+
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Config/OurFirebase.dart';
 import 'package:allolab/Models/messages.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:allolab/db/dbHelper.dart';
+import 'package:allolab/db/sqlite.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart' as urlLauncher ; 
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart' as urlLauncher ; 
+import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io' as Io;
+import 'dart:io' ;
+import 'dart:convert' as convert;
 
 class Chat extends StatefulWidget {
-  const Chat({super.key});
+  String title;
+  String chatId;
+  String p2;
+  String p1;
+  String p1Name;
+  String p2Name;
+
+  Chat({super.key, required this.title, required this.chatId, required this.p2, required this.p1, 
+  required this.p1Name , required this.p2Name});
 
   @override
   State<Chat> createState() => _ChatState();
@@ -14,51 +40,182 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
 
-  String doctorId = 'doctor123';
-  String patientId = 'patient456';
+  List<Messages> messages = [];
+  final ScrollController _scrollController = ScrollController();
 
-  String me = "doctor123";
-
-
-List<Messages> getMessages() {
-
-    List<Messages> messages = [
-    Messages(
-      senderId: doctorId,
-      receiverId: patientId,
-      type: 'text',
-      message: 'Please describe your symptoms in detail.',
-      timestamp: DateTime(2023, 11, 24, 10, 30),
-    ),
-    Messages(
-      senderId: patientId,
-      receiverId: doctorId,
-      type: 'text',
-      message: 'I have been experiencing headaches and dizziness for the past week.',
-      timestamp: DateTime(2023, 11, 24, 10, 35),
-    ),
-    Messages(
-      senderId: doctorId,
-      receiverId: patientId,
-      type: 'text',
-      message: 'Have you noticed any other symptoms?',
-      timestamp: DateTime(2023, 11, 24, 10, 40),
-    ),
-    // ... Add more messages as needed
-  ];
-
-  return messages;
   
-}
+
+  TextEditingController textInput = TextEditingController();
+
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final CollectionReference _chatsCollection = _firestore.collection('chats');
+
+  void submit() async {
+
+    String type = "text";
+
+    if(image!=null){
+      type = "image";
+    }
+
+    // insertMessage(id: widget.chatId,
+    // senderId: widget.p1,
+    // receiverId: widget.p2,
+    // message: textInput.text,
+    // timestamp: DateTime.now()
+    // );
+
+    // print(messages);
+
+    Messages msg = Messages(
+    id: widget.chatId,
+    senderId: widget.p1,
+    receiverId: widget.p2,
+    message: textInput.text,
+    timestamp: DateTime.now(),
+    type: type
+    );
+
+    final chatDetails = {
+      "p1Name":widget.p1Name,
+      "p2Name":widget.p2Name
+    };
+
+    await OurFirebase.addMessages(msg,widget.p2,chatDetails);
+    
+
+    messages.add(msg);
+
+    await insertMessage(id: widget.chatId,
+    senderId: widget.p1,
+    receiverId: widget.p2,
+    message: textInput.text,
+    timestamp: DateTime.now(),
+    type: type);
+
+    textInput.text = "";
+
+    setState((){
+    });
+  
+  }
+
+  static Future<void> insertMessage({
+    required String id,
+    required String senderId,
+    required String receiverId,
+    required String message,
+    required DateTime timestamp,
+    String type = 'text',
+  }) async {
+    await _chatsCollection.add({
+      'id': id,
+      'senderId': senderId,
+      'receiverId': receiverId,
+      'message': message,
+      'timestamp': timestamp,
+      'type': type,
+    });
+  }
+
+  static Future<List<Messages>> getMessages(int limit, int offset) async {
+    QuerySnapshot querySnapshot = await _chatsCollection
+        .orderBy('timestamp', descending: true)
+        .limit(limit)
+        .get();
+
+    return querySnapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      return Messages(
+        id: data['id'],
+        senderId: data['senderId'],
+        receiverId: data['receiverId'],
+        message: data['message'],
+        timestamp: (data['timestamp'] as Timestamp).toDate(),
+        type: data['type'],
+      );
+    }).toList();
+  }
+
+  static Stream<List<Messages>> getMessagesStream(String chatId) {
+    return _chatsCollection
+        .where('id', isEqualTo: chatId)
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return Messages(
+          id: data['id'],
+          senderId: data['senderId'],
+          receiverId: data['receiverId'],
+          message: data['message'],
+          timestamp: (data['timestamp'] as Timestamp).toDate(),
+          type: data['type'],
+        );
+      }).toList();
+    });
+  }
+
+  static Future<void> updateMessage(String messageId, Map<String, dynamic> data) async {
+    await _chatsCollection.doc(messageId).update(data);
+  }
+
+  static Future<void> deleteMessage(String messageId) async {
+    await _chatsCollection.doc(messageId).delete();
+  }
+
+
+
+  final picker = ImagePicker();
+  late var fileImage64;
+
+   File? image;
+
+  Future getImageFromCamera() async {
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 20);
+    if (pickedFile != null) {
+      final bytes = await Io.File(pickedFile.path).readAsBytes();
+      fileImage64 = convert.base64Encode(bytes);
+      image = File(pickedFile.path);
+
+      Fluttertoast.showToast(
+          msg: "Report Updated Successfully", backgroundColor: PrimaryColor);
+    } else {
+      print('No image selected.');
+    }
+  setState(() {
+    
+  });
+  }
+
+    Future<void> getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 20,
+    );
+    if (pickedFile != null) {
+      final bytes = await Io.File(pickedFile.path).readAsBytes();
+      fileImage64 = convert.base64Encode(bytes);
+      image = File(pickedFile.path);
+
+      Fluttertoast.showToast(
+          msg: "Report Updated Successfully", backgroundColor: PrimaryColor);
+    } else {
+      print('No image selected.');
+    }
+  }
 
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-            automaticallyImplyLeading: false,
+    return  Scaffold(
+        appBar: AppBar(
+                      automaticallyImplyLeading: false,
             backgroundColor: Colors.white,
-            flexibleSpace: SafeArea(
+
+                        flexibleSpace: SafeArea(
               child: Container(
                 padding: EdgeInsets.only(right: 16),
                 child: Row(
@@ -75,136 +232,164 @@ List<Messages> getMessages() {
                     SizedBox(
                       width: 2,
                     ),
-                    Stack(alignment: Alignment.bottomRight, children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        backgroundImage: NetworkImage(
-                          true
-                            ? "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
-                            : "fill user profile pic image"),
-                        radius: 18,
-                      ),
-                      // OnlineDotIndicator(
-                      //   uid: searchedUser.uid,
-                      //   type: type,
-                      // ),
-                    ]),
-                    SizedBox(
-                      width: 12,
-                    ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                           "Senthil Kumar",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
+                                  widget.title,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                )
+                              ,
                           SizedBox(
-                            height: 6,
+                            height: 1,
                           ),
-                          Text(
+
+                                 Text(
                                   "Online",
                                   style: TextStyle(
                                       color: Colors.grey.shade600,
                                       fontSize: 13),
                                 ),
+
+                          // StreamBuilder<DocumentSnapshot>(
+                          //     stream: title == "Doctor"
+                          //         ? MainScreenController().getUserStream(
+                          //             uID: chatController
+                          //                 .doctorDetails.value.uid!,
+                          //             type: "Doctor")
+                          //         : MainScreenController().getUserStream(
+                          //             uID: chatController
+                          //                 .healthWorkerDetails.value.uid!,
+                          //             type: "HealthWorker"),
+                          //     builder: (context, snapshot) {
+                          //       Users? users;
+                          //       if (snapshot.hasData &&
+                          //           snapshot.data!.data() != null) {
+                          //         users = Users.fromMap(snapshot.data!.data()
+                          //             as Map<String, dynamic>);
+                          //       }
+                          //       return Text(
+                          //         "${users?.status}",
+                          //         style: TextStyle(
+                          //             color: Colors.grey.shade600,
+                          //             fontSize: 13),
+                          //       );
+                          //     }),
                         ],
                       ),
                     ),
-                    // IconButton(
-                    //   onPressed: () async {
-                    //     if (await Permissions
-                    //         .cameraAndMicrophonePermissionsGranted()) {
-                    //       DocumentSnapshot documentSnapshot = await fireStore
-                    //           .collection("agent")
-                    //           .doc(hospitalDocument)
-                    //           .collection("healthWorker")
-                    //           .doc(data.read("token"))
-                    //           .get();
-                    //       Users users = Users.fromMap(
-                    //           documentSnapshot.data() as Map<String, dynamic>);
-                    //       CallUtils.dial(
-                    //         from: users,
-                    //         to: searchedUser,
-                    //         callType: "video",
-                    //       );
-                    //     } else {}
-                    //   },
-                    //   icon: Icon(
-                    //     Icons.videocam,
-                    //     color: PrimaryColor,
-                    //     size: 30.0,
-                    //   ),
-                    // ),
-                    // IconButton(
-                    //   onPressed: () async {
-                    //     if (await Permissions.microphonePermissionsGranted()) {
-                    //       DocumentSnapshot documentSnapshot = await fireStore
-                    //           .collection("agent")
-                    //           .doc(hospitalDocument)
-                    //           .collection("healthWorker")
-                    //           .doc(data.read("token"))
-                    //           .get();
-                    //       Users users = Users.fromMap(
-                    //           documentSnapshot.data() as Map<String, dynamic>);
-                    //       CallUtils.dial(
-                    //         from: users,
-                    //         to: searchedUser,
-                    //         callType: "voice",
-                    //       );
-                    //     } else {}
-                    //   },
-                    //   icon: Icon(
-                    //     Icons.phone,
-                    //     color: PrimaryColor,
-                    //     size: 30.0,
-                    //   ),
-                    // ),
+                    IconButton(
+                      onPressed: () async {
+
+                        // createChatTable();
+                        // if (await Permissions
+                        //     .cameraAndMicrophonePermissionsGranted()) {
+                        //   DocumentSnapshot documentSnapshot = await fireStore
+                        //       .collection(patientCollection)
+                        //       .doc(authUser!.uid)
+                        //       .get();
+                        //   Users users = Users.fromMap(
+                        //       documentSnapshot.data() as Map<String, dynamic>);
+                        //   CallUtils.dial(
+                        //     from: users,
+                        //     to: searchedUser,
+                        //     callType: "video",
+                        //   );
+                        // } else {}
+                      },
+                      icon: Icon(
+                        Icons.videocam,
+                        color: PrimaryColor,
+                        size: 30.0,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                       widget.title == 'Doctor' ? await urlLauncher.launch('tel:04523500629') : await urlLauncher.launch('tel:04523500630');
+                        // if (await Permissions.microphonePermissionsGranted()) {
+                        //   DocumentSnapshot documentSnapshot = await fireStore
+                        //       .collection(patientCollection)
+                        //       .doc(authUser!.uid)
+                        //       .get();
+                        //   Users users = Users.fromMap(
+                        //       documentSnapshot.data() as Map<String, dynamic>);
+                        //   CallUtils.dial(
+                        //     from: users,
+                        //     to: searchedUser,
+                        //     callType: "voice",
+                        //   );
+                        // } else {}
+                      
+                      },
+                      icon: Icon(
+                        Icons.phone,
+                        color: PrimaryColor,
+                        size: 30.0,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
+          
+        ),
 
-          body: Column(
+
+
+            body: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Expanded(
                 child: Scrollbar(
-                  radius: Radius.circular(4),
-                  // controller: chatController.scrollController,
-                  child:  true?ListView.builder(
-                            padding: EdgeInsets.only(top: 10, bottom: 10),
-                            physics: AlwaysScrollableScrollPhysics(),
-                            // controller: chatController.scrollController,
-                            itemCount: 1,
-                            shrinkWrap: true,
-                            reverse: true,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                padding: EdgeInsets.only(
-                                    left: 14, right: 14, top: 8),
-                                child: Align(
-                                  alignment: (
-                                      true
-                                      ? Alignment.topRight
-                                      : Alignment.topLeft),
-                                  child: chatMessageView(
-                                      getMessages(), index, context),
-                                ),
-                              );
-                            },
-                          ) :Center(child: Text("No messages"))
-                      ,
-                ),
+                    radius: Radius.circular(4),
+                    controller: _scrollController,
+                    
+ child : StreamBuilder<List<Messages>>(
+      stream: getMessagesStream(widget.chatId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          print(snapshot.error);
+          return Center(child: Text('Error: ${snapshot.error}'));
+
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No messages yet'));
+        }
+
+        List<Messages> messages = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: messages.length,
+          shrinkWrap: true,
+          reverse: true, // To show latest messages at the bottom
+          padding: EdgeInsets.only(top: 10, bottom: 10),
+          physics: AlwaysScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return Container(
+              padding: EdgeInsets.only(left: 14, right: 14, top: 8),
+              child: Align(
+                alignment: (messages[index].senderId == widget.p1
+                    ? Alignment.topRight
+                    : Alignment.topLeft),
+                child: chatMessageView(messages, index, widget.p1, context),
               ),
-
-
-              // bottom bar
-
+            );
+          },
+        );
+      },
+    )
+                        
+                        ),
+              ),
               Align(
                   alignment: Alignment.bottomLeft,
                   child: Container(
@@ -227,7 +412,8 @@ List<Messages> getMessages() {
                               children: [
                                 InkWell(
                                     onTap: () {
-                                      // print("Emoji clicked");
+                                      // print("Clicked Emoji Picker");
+                                      emojiContainer();
                                       // chatController.emojiShowing.value =
                                       //     !chatController.emojiShowing.value
                                       //         .obs();
@@ -248,7 +434,7 @@ List<Messages> getMessages() {
                                     ),
                                     child: TextField(
                                       onTap: () {},
-                                      // controller: chatController.chatMessage,
+                                      controller: textInput,
                                       keyboardType: TextInputType.multiline,
                                       maxLines: null,
                                       cursorColor: PrimaryColor,
@@ -294,34 +480,7 @@ List<Messages> getMessages() {
                                                     elevation: 0,
                                                     tooltip: "Gallery",
                                                     onPressed: () async {
-                                                      // chatController
-                                                      //     .scrollController
-                                                      //     .animateTo(
-                                                      //   0.0,
-                                                      //   curve: Curves.easeOut,
-                                                      //   duration:
-                                                      //       const Duration(
-                                                      //           milliseconds:
-                                                      //               300),
-                                                      // );
-                                                      // Navigator.pop(context);
 
-                                                      // await chatController
-                                                      //     .pickImage(
-                                                      //         ImageSource
-                                                      //             .gallery,
-                                                      //         senderId:
-                                                      //             data.read(
-                                                      //                 "token"),
-                                                      //         receiverId:
-                                                      //             searchedUser
-                                                      //                 .uid,
-                                                      //         type: type);
-                                                      // Fluttertoast.showToast(
-                                                      //     msg:
-                                                      //         "Image Sent Successfully",
-                                                      //     backgroundColor:
-                                                      //         PrimaryColor);
                                                     },
                                                     child: Icon(Icons.photo,
                                                         color: White)),
@@ -331,33 +490,7 @@ List<Messages> getMessages() {
                                                     elevation: 0,
                                                     tooltip: "File",
                                                     onPressed: () async {
-                                                      // chatController
-                                                      //     .scrollController
-                                                      //     .animateTo(
-                                                      //   0.0,
-                                                      //   curve: Curves.easeOut,
-                                                      //   duration:
-                                                      //       const Duration(
-                                                      //           milliseconds:
-                                                      //               300),
-                                                      // );
-                                                      // Navigator.pop(context);
-
-                                                      // await chatController
-                                                      //     .pickFile(
-                                                      //         FileType.any,
-                                                      //         senderId: data
-                                                      //             .read(
-                                                      //                 "token"),
-                                                      //         receiverId:
-                                                      //             searchedUser
-                                                      //                 .uid,
-                                                      //         type: type);
-                                                      // Fluttertoast.showToast(
-                                                      //     msg:
-                                                      //         "Document Sent Succesfully",
-                                                      //     backgroundColor:
-                                                      //         PrimaryColor);
+                                                     
                                                     },
                                                     child: Icon(
                                                       Icons.file_copy,
@@ -385,14 +518,25 @@ List<Messages> getMessages() {
                                         //   duration:
                                         //       const Duration(milliseconds: 300),
                                         // );
-                                        // await chatController.pickImage(
-                                        //     ImageSource.camera,
-                                        //     senderId: data.read('token'),
-                                        //     receiverId: searchedUser.uid,
-                                        //     type: type);
-                                        // Fluttertoast.showToast(
-                                        //     msg: "Image Sent Successfully",
-                                        //     backgroundColor: PrimaryColor);
+                                        // title == "Doctor"
+                                        //     ? await chatController.pickImage(
+                                        //         ImageSource.camera,
+                                        //         senderId: FirebaseAuth
+                                        //             .instance.currentUser!.uid,
+                                        //         receiverId: chatController
+                                        //             .doctorDetails.value.uid!,
+                                        //         type: title,
+                                        //         receiverDetails: searchedUser)
+                                        //     : await chatController.pickImage(
+                                        //         ImageSource.camera,
+                                        //         senderId: FirebaseAuth
+                                        //             .instance.currentUser!.uid,
+                                        //         receiverId: chatController
+                                        //             .healthWorkerDetails
+                                        //             .value
+                                        //             .uid!,
+                                        //         type: title,
+                                        //         receiverDetails: searchedUser);
                                       },
                                       child: Icon(
                                         Icons.camera_alt_rounded,
@@ -413,20 +557,44 @@ List<Messages> getMessages() {
                             width: 50,
                             child: FloatingActionButton(
                               onPressed: () {
+                                submit();
                                 // var text = chatController.chatMessage.text;
-                                // Messages message;
-                                // message = Messages(
-                                //     receiverId: searchedUser.uid,
-                                //     senderId: data.read("token"),
-                                //     message: text,
-                                //     timestamp: Timestamp.now(),
-                                //     type: 'text');
-                                // chatController.scrollController.animateTo(
-                                //   0.0,
-                                //   curve: Curves.easeOut,
-                                //   duration: const Duration(milliseconds: 300),
-                                // );
-                                // chatController.sendMessageToDb(message, type);
+                                // if (text != "") {
+                                //   Messages message;
+                                //   title == "Doctor"
+                                //       ? message = Messages(
+                                //           receiverId: chatController
+                                //               .doctorDetails.value.uid,
+                                //           senderId: FirebaseAuth
+                                //               .instance.currentUser?.uid,
+                                //           message: text,
+                                //           timestamp: Timestamp.now(),
+                                //           type: 'text')
+                                //       : message = Messages(
+                                //           receiverId: chatController
+                                //               .healthWorkerDetails.value.uid,
+                                //           senderId: FirebaseAuth
+                                //               .instance.currentUser?.uid,
+                                //           message: text,
+                                //           timestamp: Timestamp.now(),
+                                //           type: 'text');
+                                //   chatController.scrollController.animateTo(
+                                //     0.0,
+                                //     curve: Curves.easeOut,
+                                //     duration: const Duration(milliseconds: 300),
+                                //   );
+                                //   String? senderName = title == "Doctor"
+                                //       ? chatController.doctorDetails.value.name
+                                //       : chatController
+                                //           .healthWorkerDetails.value.name;
+                                //   String? deviceToken = title == "Doctor"
+                                //       ? chatController
+                                //           .doctorDetails.value.fcmToken
+                                //       : chatController
+                                //           .healthWorkerDetails.value.fcmToken;
+                                //   chatController.sendMessageToDb(
+                                //       message, title, senderName, deviceToken);
+                                // }
                               },
                               child: Icon(
                                 Icons.send,
@@ -439,19 +607,34 @@ List<Messages> getMessages() {
                       ],
                     ),
                   )),
-
-
-            ]
+              Offstage(
+                // offstage: !chatController.emojiShowing.value,
+                child: SizedBox(
+                  height: 250,
+                  child: emojiContainer(),
+                ),
+              ),
+              
+            ],
           ),
-    );
-  }
+        
 
-    Widget chatMessageView(
-      List<Messages> fullMessage, int index, BuildContext context) {
+      
+      );
+    
+  }
+}
+
+String testUID = "2";
+
+
+  Widget chatMessageView(
+      List<Messages> fullMessage, int index,String p1, BuildContext context) {
     DateTime timestamp = fullMessage[index].timestamp!;
-    final DateTime dateTime = timestamp.toLocal();
-    final dateString = DateFormat.jm().format(dateTime);
-    final date = DateFormat("d MMM ").format(dateTime);
+    final String dateTime = "14-07-23";
+    final dt = fullMessage[index].timestamp;
+    final dateString = DateFormat.jm().format(dt!);
+    final date = DateFormat("d MMM ").format(dt);
     final type = fullMessage[index].type;
     switch (type) {
       case 'image':
@@ -460,7 +643,7 @@ List<Messages> getMessages() {
               builder: (context) => Container(
                   color: Black,
                   height: Get.height,
-                  width: Get.width / 2,
+                  width: Get.width * 0.8,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -475,17 +658,19 @@ List<Messages> getMessages() {
                         ),
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
                       fullMessage[index].photoUrl != null
-                          ? Expanded(
-                              child: Center(
+                          ? Center(
+                              child: SizedBox(
+                                height: Get.height * 0.8,
+                                width: Get.width * 0.8,
                                 child: InteractiveViewer(
                                   child: CachedNetworkImage(
                                     imageUrl: fullMessage[index].photoUrl!,
                                     fit: BoxFit.contain,
-                                    placeholder: (context, url) => Center(
-                                        child: CircularProgressIndicator()),
+                                    placeholder: (context, url) =>
+                                        CircularProgressIndicator(),
                                   ),
                                 ),
                               ),
@@ -501,27 +686,22 @@ List<Messages> getMessages() {
             ),
             padding: EdgeInsets.zero,
             child: Column(
-              crossAxisAlignment:
-                  (fullMessage[index].senderId == me
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start),
+              crossAxisAlignment: (fullMessage[index].senderId == p1
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start),
               children: [
-                SizedBox(
-                  height: 200,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: CachedNetworkImage(
-                      imageUrl: fullMessage[index].photoUrl!,
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: CachedNetworkImage(
+                    imageUrl: fullMessage[index].photoUrl!,
+                    placeholder: (context, url) => CircularProgressIndicator(),
                   ),
                 ),
                 SizedBox(
                   height: 4,
                 ),
                 Text(
-                  date + ", " + dateString,
+                  date + "," + dateString,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
@@ -537,21 +717,23 @@ List<Messages> getMessages() {
           constraints: BoxConstraints(maxWidth: 200),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: (fullMessage[index].senderId == me
+              color: (fullMessage[index].senderId ==
+                      p1
                   ? PrimaryColor
                   : Black200)),
           padding: EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8),
           child: Column(
-            crossAxisAlignment:
-                (fullMessage[index].senderId == me
-                    ? CrossAxisAlignment.end
-                    : CrossAxisAlignment.start),
+            crossAxisAlignment: (fullMessage[index].senderId ==
+                    p1
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start),
             children: [
               Text(
                 fullMessage[index].message!,
                 style: TextStyle(
                   fontSize: 16,
-                  color: (fullMessage[index].senderId == me
+                  color: (fullMessage[index].senderId ==
+                          testUID
                       ? White
                       : Black),
                 ),
@@ -563,7 +745,8 @@ List<Messages> getMessages() {
                 date + ", " + dateString,
                 style: TextStyle(
                   fontSize: 12,
-                  color: (fullMessage[index].senderId == me
+                  color: (fullMessage[index].senderId ==
+                          testUID
                       ? Colors.grey[300]
                       : Colors.grey),
                 ),
@@ -577,124 +760,126 @@ List<Messages> getMessages() {
           constraints: BoxConstraints(maxWidth: 250),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: (fullMessage[index].senderId == me
+              color: (fullMessage[index].senderId ==
+                      testUID
                   ? PrimaryColor
                   : Black200)),
           padding: EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                  height: 42,
-                  width: 42,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24), color: White),
-                  child: 
-                  // chatController.messageIndex ==index &&
-                  //             chatController.progress != 0.0
-                  //         ? Stack(alignment: Alignment.center, children: [
-                  //             CircularProgressIndicator(
-                  //               value: chatController.progress.toDouble(),
-                  //               valueColor:
-                  //                   AlwaysStoppedAnimation<Color>(PrimaryColor),
-                  //               backgroundColor: White,
-                  //             ),
-                  //             GestureDetector(
-                  //               onTap: () {
-                  //                 // FlutterDownloader.cancel(taskId: id!);
-                  //               },
-                  //               child: Icon(
-                  //                 Icons.clear,
-                  //                 color: PrimaryColor,
-                  //               ),
-                  //             )
-                  //           ])
-                  //         : 
-                          GestureDetector(
-                              onTap: () async {
-                                // final status =
-                                //     await Permission.storage.request();
-                                // final externalDir =
-                                //     await getExternalStorageDirectory();
-                                // var a =
-                                //     "${externalDir!.path}/${fullMessage[index].fileName}";
+              // Container(
+              //     height: 42,
+              //     width: 42,
+              //     decoration: BoxDecoration(
+              //         borderRadius: BorderRadius.circular(24), color: White),
+              //     child: GetBuilder<ChatController>(
+              //         builder: (chatController) => chatController
+              //                         .messageIndex ==
+              //                     index &&
+              //                 chatController.progress != 0.0
+              //             ? Stack(alignment: Alignment.center, children: [
+              //                 CircularProgressIndicator(
+              //                   value: chatController.progress.toDouble(),
+              //                   valueColor:
+              //                       AlwaysStoppedAnimation<Color>(PrimaryColor),
+              //                   backgroundColor: White,
+              //                 ),
+              //                 GestureDetector(
+              //                   onTap: () {
+              //                     FlutterDownloader.cancel(taskId: id);
+              //                   },
+              //                   child: Icon(
+              //                     Icons.clear,
+              //                     color: PrimaryColor,
+              //                   ),
+              //                 )
+              //               ])
+              //             : GestureDetector(
+              //                 onTap: () async {
+              //                   final status =
+              //                       await Permission.storage.request();
+              //                   final externalDir =
+              //                       await getExternalStorageDirectory();
+              //                   var a =
+              //                       "${externalDir!.path}/${fullMessage[index].fileName}";
 
-                                // bool fileExists = await File(a).exists();
-                                // print(fileExists);
-                                // if (fileExists) {
-                                //   showDialog(
-                                //       builder: (context) => Container(
-                                //           color: Black,
-                                //           height: Get.height,
-                                //           width: Get.width / 2,
-                                //           child: Column(
-                                //             crossAxisAlignment:
-                                //                 CrossAxisAlignment.start,
-                                //             children: [
-                                //               Material(
-                                //                 color: Colors.transparent,
-                                //                 child: IconButton(
-                                //                   onPressed: () =>
-                                //                       Navigator.pop(context),
-                                //                   icon: Icon(
-                                //                     Icons.arrow_back,
-                                //                     color: White,
-                                //                   ),
-                                //                 ),
-                                //               ),
-                                //               SizedBox(
-                                //                 height: 20,
-                                //               ),
-                                //               Expanded(
-                                //                 child: Center(
-                                //                   child: Image.file(
-                                //                     File(a),
-                                //                     fit: BoxFit.contain,
-                                //                   ),
-                                //                 ),
-                                //               ),
-                                //             ],
-                                //           )),
-                                //       context: context);
-                                // } else {
-                                //   if (status.isGranted) {
-                                //     final externalDir =
-                                //         await getExternalStorageDirectory();
-                                //     chatController.onMessageIndex(index);
-                                //     id = (await FlutterDownloader.enqueue(
-                                //         url: fullMessage[index].fileUrl!,
-                                //         savedDir: externalDir!.path,
-                                //         fileName: fullMessage[index].fileName,
-                                //         openFileFromNotification: true,
-                                //         showNotification: true))!;
-                                //   } else {
-                                //     print("permission denied");
-                                //   }
-                                // }
-                              },
-                              child: Icon(
-                                Icons.arrow_downward,
-                                color: PrimaryColor,
-                              ),
-                            )),
+              //                   bool fileExists = await File(a).exists();
+              //                   print(fileExists);
+              //                   if (fileExists) {
+              //                     showDialog(
+              //                         builder: (context) => Container(
+              //                             color: Black,
+              //                             height: Get.height,
+              //                             width: Get.width / 2,
+              //                             child: Column(
+              //                               crossAxisAlignment:
+              //                                   CrossAxisAlignment.start,
+              //                               children: [
+              //                                 Material(
+              //                                   color: Colors.transparent,
+              //                                   child: IconButton(
+              //                                     onPressed: () =>
+              //                                         Navigator.pop(context),
+              //                                     icon: Icon(
+              //                                       Icons.arrow_back,
+              //                                       color: White,
+              //                                     ),
+              //                                   ),
+              //                                 ),
+              //                                 SizedBox(
+              //                                   height: 20,
+              //                                 ),
+              //                                 Expanded(
+              //                                   child: Center(
+              //                                     child: Image.file(
+              //                                       File(a),
+              //                                       fit: BoxFit.contain,
+              //                                     ),
+              //                                   ),
+              //                                 ),
+              //                               ],
+              //                             )),
+              //                         context: context);
+              //                   } else {
+              //                     if (status.isGranted) {
+              //                       final externalDir =
+              //                           await getExternalStorageDirectory();
+              //                       chatController.onMessageIndex(index);
+              //                       id = (await FlutterDownloader.enqueue(
+              //                           url: fullMessage[index].fileUrl!,
+              //                           savedDir: externalDir!.path,
+              //                           fileName: fullMessage[index].fileName,
+              //                           openFileFromNotification: true,
+              //                           showNotification: true))!;
+              //                     } else {
+              //                       print("permission denied");
+              //                     }
+              //                   }
+              //                 },
+              //                 child: Icon(
+              //                   Icons.arrow_downward,
+              //                   color: PrimaryColor,
+              //                 ),
+              //               ))),
               SizedBox(
                 width: 10,
               ),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      (fullMessage[index].senderId == me
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start),
+                  crossAxisAlignment: (fullMessage[index].senderId ==
+                         testUID
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start),
                   children: [
                     Text(
                       fullMessage[index].fileName!,
                       style: TextStyle(
                         fontSize: 16,
-                        color:
-                            (fullMessage[index].senderId == me
-                                ? White
-                                : Black),
+                        color: (fullMessage[index].senderId ==
+                                testUID
+                            ? White
+                            : Black),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -708,36 +893,47 @@ List<Messages> getMessages() {
                           fullMessage[index].fileSize!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: (fullMessage[index].senderId ==
-                                    me
+                            color: (fullMessage[index].senderId == p1
                                 ? Colors.grey[300]
                                 : Black),
                           ),
                         ),
+                                // chatController.messageIndex == index &&
+                                //         chatController.progress != 0.0
+                                //     ? Text(
+                                //         (chatController.progress * 100)
+                                //                 .toInt()
+                                //                 .toString() +
+                                //             "%",
+                                //         style: TextStyle(
+                                //           fontSize: 12,
+                                //           color: (fullMessage[index].senderId == 2
 
-                        // GetBuilder<ChatController>(
-                        //     builder: (chatController) =>
-                        //         chatController.messageIndex == index &&
-                        //                 chatController.progress != 0.0
-                        //             ? Text(
-                        //                 (chatController.progress * 100)
-                        //                         .toInt()
-                        //                         .toString() +
-                        //                     "%",
-                        //                 style: TextStyle(
-                        //                   fontSize: 12,
-                        //                   color: (fullMessage[index].senderId ==
-                        //                           me
-                        //                       ? Colors.grey[300]
-                        //                       : Black),
-                        //                 ))
-                        //             : Container()),
+                                //               ? Colors.grey[300]
+                                //               : Black),
+                                //         ))
+                                //     : Container(),
+                                      Text(
+                                        // (chatController.progress * 100)
+                                        //         .toInt()
+                                        //         .toString() 
+                                                "90"
+                                                +
+                                            "%",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: (fullMessage[index].senderId == p1
+
+                                              ? Colors.grey[300]
+                                              : Black),
+                                        )),
+
                         Text(
                           date + ", " + dateString,
                           style: TextStyle(
                             fontSize: 12,
-                            color: (fullMessage[index].senderId ==
-                                    me
+                            color: (fullMessage[index].senderId == p1
+                                    
                                 ? Colors.grey[300]
                                 : Colors.grey),
                           ),
@@ -754,4 +950,46 @@ List<Messages> getMessages() {
         return Container();
     }
   }
-}
+
+    emojiContainer() {
+    // print("working");
+    return EmojiPicker(
+
+      onEmojiSelected: (category, emoji) {
+        // chatController.onEmojiSelected(emoji);
+      },
+      // onBackspacePressed: chatController.onBackspacePressed(),
+      config:const  Config(
+emojiViewConfig: EmojiViewConfig(
+            columns: 7,
+          emojiSizeMax: 32.0,
+          verticalSpacing: 0,
+          horizontalSpacing: 0,
+          recentsLimit: 28,
+          buttonMode: ButtonMode.MATERIAL
+          ),
+
+          categoryViewConfig: CategoryViewConfig(
+          initCategory: Category.RECENT,
+          indicatorColor: Colors.blue,
+          iconColor: Colors.grey,
+          iconColorSelected: Colors.blue,
+          categoryIcons: const CategoryIcons(),
+          ),
+
+
+
+      // bottomActionBarConfig: BottomActionBarConfig(                      
+      //   bgColor: Color(0xFFF2F2F2),
+      //     progressIndicatorColor: Colors.blue,
+      //     showRecentsTab: true,
+      //     noRecentsText: "No Recents",
+      //     noRecentsStyle: const TextStyle(fontSize: 20, color: Colors.black26),)
+
+),
+
+
+
+    );
+  }
+

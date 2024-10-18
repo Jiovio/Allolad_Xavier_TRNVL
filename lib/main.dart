@@ -9,12 +9,30 @@ import 'package:sqflite/sqflite.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'package:workmanager/workmanager.dart';
+import 'utils/backgroundservice.dart';
+
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    await Backgroundservice.initializeNotifications();
+    await Backgroundservice.listenForData();
+    return Future.value(true);
+  });
+}
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Sqlite.db();
   await initLocalStorage();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
+
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+
   runApp(const MyApp());
 }
+
+

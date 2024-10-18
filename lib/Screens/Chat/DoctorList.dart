@@ -50,11 +50,13 @@ Widget doctorChatList(id) {
           //     ),
           onTap: () {
             String type = "Doctor";
-                        Get.to(() => Chat(),
-                transition: Transition.rightToLeft);
-            // Get.to(() => Chat(),
-            //     arguments: [searchedUser, type],
-            //     transition: Transition.rightToLeft);
+
+            print(type);
+                //         Get.to(() => Chat(),
+                // transition: Transition.rightToLeft);
+
+
+
           },
         );
       

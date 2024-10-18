@@ -1,7 +1,10 @@
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Config/OurFirebase.dart';
 import 'package:allolab/Screens/Chat/DoctorList.dart';
 import 'package:allolab/Screens/Chat/HealthWorker.dart';
 import 'package:allolab/Screens/Chat/PatientList.dart';
+import 'package:allolab/db/dbHelper.dart';
+import 'package:allolab/utils/backgroundservice.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -79,7 +82,15 @@ class ChatScreen extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           heroTag: "contact",
           backgroundColor: PrimaryColor,
-          onPressed: () {
+          onPressed: () async {
+            // await createChatTable();
+          //  await Backgroundservice.processDataList();
+
+          //  await Backgroundservice.listenForData();
+
+
+
+            // await createChatTable();
             // Get.to(() => SearchSection(), transition: Transition.rightToLeft);
           },
           child: Icon(
@@ -90,7 +101,7 @@ class ChatScreen extends StatelessWidget {
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: [
-            patientList(),
+            patientChatList(),
             doctorList(context),
             healthWorkerContactList(context),
           ],

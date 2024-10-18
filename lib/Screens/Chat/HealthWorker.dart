@@ -50,8 +50,8 @@ Widget healthWorkerChatList(id) {
           //     ),
           onTap: () {
             String type = "HealthWorker";
-                        Get.to(() => Chat(),
-                transition: Transition.rightToLeft);
+                //         Get.to(() => Chat(),
+                // transition: Transition.rightToLeft);
             // Get.to(() => Chat(),
             //     arguments: [searchedUser, type],
             //     transition: Transition.rightToLeft);

@@ -71,6 +71,34 @@ CREATE TABLE sync (
     );
   ''');
 
+
+  await db.execute('''
+    CREATE TABLE chatlist (
+      name TEXT,
+      fid TEXT,
+      id TEXT,
+      type TEXT,
+      lastMessage TEXT,
+      recent TIMESTAMP
+    );
+  ''');
+
+  await db.execute('''
+    CREATE TABLE chats (
+      id TEXT NOT NULL,
+      senderId TEXT NOT NULL,
+      receiverId TEXT NOT NULL,
+      type TEXT,
+      message TEXT,
+      timestamp TIMESTAMP NOT NULL,
+      photoUrl TEXT,
+      fileUrl TEXT,
+      fileSize TEXT,
+      fileName TEXT,
+      fid TEXT
+);
+''');
+
     // await db.execute('''
     //   insert into my_table (name) values("vijay");
     // ''');

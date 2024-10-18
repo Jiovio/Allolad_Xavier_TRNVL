@@ -50,6 +50,16 @@ dependencies:
   crypto: ^3.0.5
   localstorage: ^5.0.0
   firebase_core: ^3.6.0
+  firebase_database: ^11.1.1
+  firebase_vertexai: ^0.2.3+4
+  firebase_storage: ^12.3.3
+  cloud_firestore: ^5.4.4
+  emoji_picker_flutter: ^3.1.0
+  flutter_downloader: ^1.11.8
+  permission_handler: ^11.3.1
+  flutter_background_service: ^5.0.10
+  flutter_local_notifications: ^17.2.3
+  workmanager: ^0.5.2
 
 
 

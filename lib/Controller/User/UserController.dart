@@ -2,11 +2,20 @@
 import 'dart:convert';
 
 import 'package:allolab/API/Requests/Userapi.dart';
+import 'package:allolab/utils/backgroundservice.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
+import 'package:workmanager/workmanager.dart';
 
 class Usercontroller extends GetxController{
+
+    void scheduleBackgroundTask() {
+  Workmanager().registerOneOffTask(
+    "1",
+    "listenForDataTask", 
+  );
+}
 
   RxBool loading = true.obs;
 
@@ -18,6 +27,10 @@ class Usercontroller extends GetxController{
   fromJson(req);
 
   loading.value = false;
+
+  // scheduleBackgroundTask();
+
+  Backgroundservice.listenForData();
   update();
 
  }
@@ -29,6 +42,7 @@ class Usercontroller extends GetxController{
     super.onInit();
     initScreen();
   }
+
 
 
   String locale = "English";
