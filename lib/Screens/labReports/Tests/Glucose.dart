@@ -1,12 +1,12 @@
 
 import 'dart:convert';
 
-import 'package:allolab/Components/textfield.dart';
+
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Controller/Reports/glucoseController.dart';
-import 'package:allolab/Screens/Screening/Vitals/BloodGlucose.dart';
 import 'package:allolab/Screens/labReports/Widgets/selectorWidgets.dart';
 import 'package:flutter/material.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:get/get.dart';
 
 class Glucose extends StatelessWidget {
@@ -16,19 +16,24 @@ class Glucose extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Glucose Report"),
+        title:const Text("Add Glucose Report"),
       ),
 
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: 
-          GetBuilder<Glucosecontroller>(
+          GetBuilder(
             init: Glucosecontroller(),
-            builder:(controller) => 
+            builder: (controller) => 
           Column(
 
             children: [
+
+
+
+            
+
 
               GestureDetector(
                 onTap: () => showDialog(
@@ -52,7 +57,6 @@ class Glucose extends StatelessWidget {
                                               )
                                             : Image.memory(base64Decode(
                                                 controller.fileImage64)),
-
 
                                                 
                                       ),
@@ -81,14 +85,14 @@ class Glucose extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: 
-                            controller.fileImage64 == null
+                              controller.fileImage64 == null
                             ? Center(
                                 child: Text(
                                 "Click Add Image Button",
                                 style: TextStyle(fontSize: 18),
                               ))
                             : Image.memory(
-                                base64Decode(controller.fileImage64)),
+                                base64Decode(controller.fileImage64))
 
                       ),
               ),
@@ -181,11 +185,19 @@ class Glucose extends StatelessWidget {
                 height: 20.0,
               ),
 
-                            TFField(label: "Description",mLines: 5,txtController: controller.desc,),
-
-               const SizedBox(
+                                      TextFormField(
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey))),
+                            controller: controller.desc,
+                          maxLines: 5
+                        ),
+                
+                              const SizedBox(
                 height: 20.0,
               ),
+
+  
 
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -195,15 +207,8 @@ class Glucose extends StatelessWidget {
                   onPressed: controller.submit,
                   child: Text("ADD REPORT"))
 
-
-
-
-
-
             ],
-          ),
-          )
-          
+          )),
           )
         ),
 

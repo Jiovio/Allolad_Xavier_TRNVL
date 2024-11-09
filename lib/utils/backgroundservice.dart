@@ -78,7 +78,7 @@ class Backgroundservice {
 
   static Future<void> deleteDataFromFirebase(fid) async {
 
-    DatabaseReference ref = FirebaseDatabase.instance.ref("users/D$myid/$fid");
+    DatabaseReference ref = FirebaseDatabase.instance.ref("users/H$myid/$fid");
 
   await ref.remove();
 
@@ -198,14 +198,14 @@ class Backgroundservice {
 
 
         if(checkMessageExists){
-          deleteDataFromFirebase(key);
+        await deleteDataFromFirebase(key);
         }
   }
 
   static listenForData() async {
 
       final userid = Local.getUserID();
-      DatabaseReference ref = FirebaseDatabase.instance.ref("users/D$userid");
+      DatabaseReference ref = FirebaseDatabase.instance.ref("users/H$userid");
 
 
 

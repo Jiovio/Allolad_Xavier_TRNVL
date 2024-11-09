@@ -1,40 +1,25 @@
 
+
 import 'dart:convert';
 
-import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Controller/Reports/hemoglobinController.dart';
-import 'package:allolab/Controller/global/InternetController.dart';
-import 'package:allolab/Screens/labReports/Scan/HemoglobinScan.dart';
 import 'package:allolab/Screens/labReports/Widgets/selectorWidgets.dart';
-import 'package:allolab/db/dbHelper.dart';
-import 'package:allolab/temp/ReportListPage.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 
-class Hemoglobin extends StatelessWidget {
-   Hemoglobin({super.key});
 
-  // Internetcontroller ic = Get.put(Internetcontroller());
+class Hemoglobin extends StatelessWidget {
+  const Hemoglobin({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Add Hemoglobin Report"),
-      ),
 
-      floatingActionButton: FloatingActionButton(onPressed: (){
-        getReports();
+      appBar: AppBar(),
 
-        // Get.to(ReportListPage());
-        
-        },
-        // child: Obx(()=>Text(ic.isOnline.value?"Yes":"No"))
-        
-        ),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -45,6 +30,16 @@ class Hemoglobin extends StatelessWidget {
                               Column(
 
             children: [
+
+                                      SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                              "Add HemoGlobin Report",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                            ),
 
               GestureDetector(
                 onTap: () => showDialog(
@@ -110,6 +105,12 @@ class Hemoglobin extends StatelessWidget {
                               ))
                             : Image.memory(
                                 base64Decode(controller.fileImage64)),
+                              // const Center(
+                              //   child: Text(
+                              //   "Click Add Image Button",
+                              //   style: TextStyle(fontSize: 18),
+                              // ))
+
                       ),
               ),
 
@@ -164,11 +165,11 @@ class Hemoglobin extends StatelessWidget {
                                                 icon: Icon(Icons.add_a_photo),
                                                 label: Text("Upload Report")),
 
-                                         TextButton.icon(onPressed: (){
-                                          Get.to(Hemoglobinscan());
-                                         }, 
-                                         icon: Icon(Icons.account_tree_sharp),
-                                         label: Text("Automatic"),)       
+                                        //  TextButton.icon(onPressed: (){
+                                        //   Get.to(Hemoglobinscan());
+                                        //  }, 
+                                        //  icon: Icon(Icons.account_tree_sharp),
+                                        //  label: Text("Automatic"),)       
                             ],
                           ),
 
@@ -218,18 +219,22 @@ class Hemoglobin extends StatelessWidget {
 
 
                            SizedBox(
-                height: 10.0,
+                height: 50.0,
               ),
 
-                            TFField(label: "Description",mLines: 5,
-                            txtController: controller.desc,),
+                            Text(controller.desc.text),
+
+                            // TFField(label: "Description",mLines: 10,
+                            // txtController: controller.desc,
+                            
+                            // ),
 
 
 
 
 
               const SizedBox(
-                height: 20.0,
+                height: 50.0,
               ),
 
               ElevatedButton(

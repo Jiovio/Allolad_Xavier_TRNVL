@@ -83,3 +83,60 @@ Future<dynamic> postRequest(str,data) async {
     throw "network Request Failed";
   }
 }
+
+
+Future<dynamic> putRequest(str,data) async {
+  final url = Uri.parse(Apiroutes().baseUrl+str); 
+
+  try {
+
+    var h = getHeaders();
+
+    final response = await http.put(url,
+    headers: {
+      "Content-Type": "application/json",
+      ...h},
+       body: json.encode(data)
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('Response data: $data');
+      return data;
+    } else {
+      print('Failed to load data. Status code: ${response.statusCode}');
+      print(response.body);
+
+      return false;
+    }
+  } catch (e) {
+    print('An error occurred: $e');
+    return false;
+  }
+}
+
+
+Future<dynamic> deleteRequest(str) async {
+  final url = Uri.parse(Apiroutes().baseUrl+str); 
+
+  try {
+
+    final response = await http.delete(url,
+    headers: getHeaders()
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print('Response data: $data');
+      return data;
+    } else {
+      print('Failed to load data. Status code: ${response.statusCode}');
+      print(response.body);
+
+      return false;
+    }
+  } catch (e) {
+    print('An error occurred: $e');
+    return false;
+  }
+}

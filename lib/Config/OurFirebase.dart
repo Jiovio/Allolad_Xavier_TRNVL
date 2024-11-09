@@ -6,7 +6,9 @@ import 'dart:math';
 
 import 'package:allolab/API/Local.dart';
 import 'package:allolab/API/Requests/Userapi.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/Models/messages.dart';
+import 'package:allolab/Screens/Call/CallView.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -15,6 +17,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:get/get.dart';
 class OurFirebase {
 
   static final db = FirebaseFirestore.instance;
@@ -35,11 +38,11 @@ class OurFirebase {
   );
 
 
-  static Future<String> uploadImageToFirebase(String phone,String path,String filename,File image) async {
+  static Future<String> uploadImageToFirebase(String appName , String path,String filename,File image,[String? phone]) async {
 
 
 
-  final spaceRef = OurFirebase.storageRef.child("/Allobaby/$phone/$path/$filename");
+  final spaceRef = OurFirebase.storageRef.child("/$appName/$phone/$path/$filename");
 
   print(spaceRef.bucket);
 
@@ -74,6 +77,30 @@ class OurFirebase {
   }
 
 
+      static Future<void>  createCall(String p2, String p1,String type) async {
+      Usercontroller controller = Get.put(Usercontroller());
+      final token = await Userapi.getCallToken(p1);
+      if(token==null){
+        Get.snackbar("Call Failed", "Error Making Call");
+        return;
+      }
+      try {
+      DatabaseReference ref = FirebaseDatabase.instance.ref("calls/$p2");
+     await  ref.set({
+      "call":true, 
+      "callerName":controller.name.text,
+      "p1":p1,
+      "p2":p2,
+      "token":token,
+      "type":type
+      });
+      Get.to(Callview(channel: p1,token: token,path: p2,));
+      } catch (e) {
+        print(e);
+      }
+    }
+
+
    static Future<String> askVertexAi(File img , String promp) async{
 
       final prompt = TextPart(promp);
@@ -87,14 +114,25 @@ final imagePart = DataPart('image/jpeg', image);
         return response.text??"";
     }
 
+    static Future<bool>  cutCall(String path) async {
+      try {
+      DatabaseReference ref = FirebaseDatabase.instance.ref("calls/$path");
+     await  ref.set({
+      "call":false
+      });
+
+      return true;
+      
+      } catch (e) {
+        print(e);
+
+        return false;
+      }
+    }
+
 
     static Future<bool> createDataWithName(String collection,String docName,dynamic data) 
     async {
-final city = <String, String>{
-  "name": "Los Angeles",
-  "state": "CA",
-  "country": "USA"
-};
     db
     .collection(collection)
     .doc(docName)

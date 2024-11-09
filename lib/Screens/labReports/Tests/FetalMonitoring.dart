@@ -1,12 +1,10 @@
 
 import 'dart:convert';
 
+
 import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Controller/Reports/fetalMonitoringController.dart';
-import 'package:allolab/Screens/Screening/Vitals/HeartRate.dart';
-
-import 'package:allolab/Screens/labReports/Scan/HemoglobinScan.dart';
 import 'package:allolab/Screens/labReports/Widgets/selectorWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -14,15 +12,18 @@ import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:numberpicker/numberpicker.dart';
 
-
 class Fetalmonitoring extends StatelessWidget {
    Fetalmonitoring({super.key});
+
+  Fetalmonitoringcontroller fetalmonitoringcontroller = Get.put(Fetalmonitoringcontroller());
+   
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        title: Text("Fetal Monitoring "),
+        title: Text("Fetal Monitoring"),
       ),
 
       body: SingleChildScrollView(
@@ -35,6 +36,8 @@ class Fetalmonitoring extends StatelessWidget {
           Column(
 
             children: [
+
+
 
               GestureDetector(
                 onTap: () => showDialog(
@@ -150,11 +153,11 @@ class Fetalmonitoring extends StatelessWidget {
                                                 icon: Icon(Icons.add_a_photo),
                                                 label: Text("Upload Report")),
 
-                                         TextButton.icon(onPressed: (){
-                                          Get.to(Hemoglobinscan());
-                                         }, 
-                                         icon: Icon(Icons.account_tree_sharp),
-                                         label: Text("Automatic"),)       
+                                        //  TextButton.icon(onPressed: (){
+                                        //   Get.to(Hemoglobinscan());
+                                        //  }, 
+                                        //  icon: Icon(Icons.account_tree_sharp),
+                                        //  label: Text("Automatic"),)       
                             ],
                           ),
 
@@ -181,12 +184,12 @@ class Fetalmonitoring extends StatelessWidget {
                                   title: Text("Heart Rate "),
                                   content: Row(
                                     children: [
-                                          fetalHeartMonitoring(),
+                                      fetalHeartMonitoring(),
 
-                                          SizedBox(width: 10,),
+                                                        SizedBox(width: 10,),
 
-                                          Text("BPM",
-                                          style: TextStyle(fontSize: 14),)
+                                                        Text("BPM",
+                                                        style: TextStyle(fontSize: 14),)
                                     ],
                                   ),);
                               },);
@@ -210,13 +213,6 @@ class Fetalmonitoring extends StatelessWidget {
                             },
                           ),
 
-
-
-
-                          
-
-
-
                         // TextFormField(
                         //   decoration: InputDecoration(
                         //     labelText: "Hemoglobin Value",
@@ -227,9 +223,8 @@ class Fetalmonitoring extends StatelessWidget {
 
 
                            SizedBox(
-                height: 10.0,
-              ),
-
+                              height: 10.0,
+                            ),
               const SizedBox(
                 height: 20.0,
               ),
@@ -261,7 +256,4 @@ class Fetalmonitoring extends StatelessWidget {
 
     );
   }
-
-
-
 }

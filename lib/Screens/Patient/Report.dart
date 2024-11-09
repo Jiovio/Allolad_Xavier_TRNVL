@@ -2,6 +2,7 @@
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Controller/PatientsController.dart';
 import 'package:allolab/Screens/Patient/ViewReport.dart';
+import 'package:allolab/Screens/labReports/LabReports.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -24,8 +25,8 @@ class Report extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               ),
-              onPressed: () {}, 
-              // Get.to(() => AddReport(), transition: Transition.rightToLeft),
+              onPressed: () => 
+              Get.to(() => LabReports(), transition: Transition.rightToLeft),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

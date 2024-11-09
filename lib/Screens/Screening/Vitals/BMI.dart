@@ -1,10 +1,14 @@
-
+import 'package:allolab/Screens/Screening/SelfScreening.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:numberpicker/numberpicker.dart';
 
-Wrap BMI() {
-  return Wrap(
+GetBuilder BMI() {
+  return 
+  GetBuilder<ConsultationScreening>(
+    
+    builder:(c) => 
+  Wrap(
     crossAxisAlignment: WrapCrossAlignment.start,
     children: [
       Text("Select Height"),
@@ -12,12 +16,11 @@ Wrap BMI() {
         children: [
 
                NumberPicker(
-                    // value: c.bmiHeight,
-                                        value: 55,
+                    value: c.healthData["bmiHeight"],
                     minValue: 50,
                     maxValue: 230,
                     onChanged: (value) {
-                      // c.bmiHeightChange(value);
+                      c.updateVitals("bmiHeight", value);
                     },
                   ),
           Text("cm")
@@ -27,13 +30,13 @@ Wrap BMI() {
       Row(
         children: [
 DecimalNumberPicker(
-                    // value: c.bmiWeight,
-                                        value: 15,
+                    value: c.healthData["bmiWeight"],
+
                     minValue: 1,
                     maxValue: 200,
                     decimalPlaces: 1,
                     onChanged: (value) {
-                      // c.bmiWeightChange(value);
+                      c.updateVitals("bmiWeight", value);
                      
                     },
                   ),
@@ -41,5 +44,5 @@ DecimalNumberPicker(
         ],
       ),
     ],
-  );
+  ));
 }

@@ -67,7 +67,8 @@ CREATE TABLE sync (
       name TEXT,
       gender TEXT,
       phone TEXT,
-      age INTEGER
+      age INTEGER,
+      data TEXT
     );
   ''');
 

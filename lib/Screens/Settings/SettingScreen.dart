@@ -1,10 +1,13 @@
+import 'package:allolab/API/Local.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/Screens/Notification/NotificationView.dart';
 import 'package:allolab/Screens/Settings/AppInfo.dart';
 import 'package:allolab/Screens/Settings/EditProfile.dart';
 import 'package:allolab/Screens/Settings/LanguageDialog.dart';
 import 'package:allolab/Screens/Signin/SigninView.dart';
 import 'package:allolab/db/sqlite.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:localstorage/localstorage.dart';
@@ -12,7 +15,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+   SettingsScreen({super.key});
+
+  Usercontroller cont = Get.put(Usercontroller());
 
   @override
   Widget build(BuildContext context) {
@@ -98,18 +103,15 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        child: false
+                        child: cont.profile_pic==null
                                     ? CircleAvatar(
                                         backgroundColor: Colors.transparent,
                                         radius: 38,
                                       )
                                     : CircleAvatar(
                                         backgroundColor: Colors.transparent,
-                                        backgroundImage: NetworkImage(
-                                          // controller
-                                              // .healthWorkerDetails[0].photo,
-                                              
-                                              "https://static-00.iconduck.com/assets.00/user-icon-1024x1024-dtzturco.png"
+                                        backgroundImage: CachedNetworkImageProvider(
+                                              cont.profile_pic as String
                                         ),
                                         radius: 38,
                                       )
@@ -125,18 +127,7 @@ class SettingsScreen extends StatelessWidget {
                           children: [
                             SizedBox(
                               height: 4,
-                            ),
-                            // GetBuilder<MainScreenController>(
-                                    false
-                                        ? Text(
-                                            "",
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.w800),
-                                          )
-                                        : Text(
-                                            // "${controller.healthWorkerDetails[0].name}",
-                                            "${"Senthil Kumar"}",
+                            ),  Text( "${cont.name.text}",
                                             style: TextStyle(
                                                 fontSize: 22,
                                                 fontWeight: FontWeight.w800),
@@ -147,14 +138,14 @@ class SettingsScreen extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  "Worker ID".tr,
+                                  "Worker ID : ".tr,
                                   style: TextStyle(
                                     color: Black800,
                                     fontSize: 16,
                                   ),
                                 ),
                                     Text(
-                                    ": a1234",
+                                    Local.getUserID().toString(),
                                     // ": ${controller.healthWorkerDetails[0].uid}",
 
                                     style: TextStyle(
@@ -257,7 +248,7 @@ ListView(
                     //               )),
                     //     )
                     onTap: () async {
-                      const url = 'www.jiovio.com/buy/termsandconditions.php';
+                      const url = 'https://savemom.in/terms.html';
                       _launchURL(url);
                     },
                   ),
@@ -281,7 +272,7 @@ ListView(
                     //               )),
                     //     )
                     onTap: () async {
-                      const url = 'www.jiovio.com';
+                      const url = 'https://savemom.in/privacy.html';
                       _launchURL(url);
                     },
                   ),
@@ -416,19 +407,9 @@ ListView(
 }
 
     _launchURL(String url) async {
-      await launchUrl(Uri.https(Uri.encodeComponent(url)));
+      print(Uri.https(Uri.encodeComponent(url)));
+      // await launchUrl(Uri.https(Uri.encodeComponent(url)));
+      await launchUrl(Uri.parse(url));
 
-    // if (await canLaunchUrl(Uri.https(url))) {
-    //   await launchUrl(Uri.https(url));
-    // } else {
-    //   throw 'Could not launch $url';
-    // }
   }
-  //   _launchURL(String url) async {
-  //   if (await canLaunchUrl(url as Uri)) {
-  //     await launchUrl(url as Uri);
-  //   } else {
-  //     throw 'Could not launch $url';
-  //   }
-  // }
 }

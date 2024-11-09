@@ -1,4 +1,11 @@
+
+import 'dart:math';
+
+import 'package:allolab/API/Requests/ReportApi.dart';
+import 'package:allolab/Components/snackBar.dart';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Config/OurFirebase.dart';
+import 'package:allolab/Controller/GlobalPatientController.dart';
 import 'package:allolab/db/dbHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -28,6 +35,7 @@ TextEditingController desc = TextEditingController();
       final bytes = await Io.File(pickedFile.path).readAsBytes();
       fileImage64 = convert.base64Encode(bytes);
       image = File(pickedFile.path);
+      askAI(image);
       Fluttertoast.showToast(
           msg: "Report Updated Successfully", backgroundColor: PrimaryColor);
     } else {
@@ -45,6 +53,7 @@ TextEditingController desc = TextEditingController();
       final bytes = await Io.File(pickedFile.path).readAsBytes();
       fileImage64 = convert.base64Encode(bytes);
       image = File(pickedFile.path);
+      askAI(image);
       Fluttertoast.showToast(
           msg: "Report Updated Successfully", backgroundColor: PrimaryColor);
     } else {
@@ -53,21 +62,66 @@ TextEditingController desc = TextEditingController();
     update();
   }
 
-      void submit (){
+      Future<void> submit () async {
     Map<String,dynamic> reportData = {
       "glucose":glucoseValue,
 
     };
 
+    Globalpatientcontroller gp = Get.put(Globalpatientcontroller());
+
+    String phone = gp.phone ?? "";
+   var random = Random();
+  int randomInt = random.nextInt(1000000);
+
+String  url = await OurFirebase.uploadImageToFirebase("Allobaby","reports","$phone $randomInt.jpg", image,phone,);
+
     Map<String,dynamic> data = {
       "reportType":"Glucose",
       "details":json.encode(reportData),
       "reportFile":fileImage64,
-
+      "imageurl":url,
+      "description":desc.text,
+      "phone":phone
     };
 
+
+  
+  // Generates a random integer between 0 and 99
     addReports(data);
 
-    // showToast("Please Enter All Details",'Fields are empty. please enter all fields.');
+  data["created"] = DateTime.now().toString();
+
+    OurFirebase.createDataWithName("reports","$phone $randomInt",data);
+
+
+        await Reportapi().addReports(data,gp.id as int);
+
+    showToast("Success","Report Added Successfully");
+
+    Get.back();
+
+
+
+
+  }
+
+
+
+      Future<void> askAI(File img) async {
+
+      String prompt = """This is a health report. 
+      give me bloodGlucose value and the general summary in the schema 
+      {glucoseValue: double ,
+      summary:string}""";
+      dynamic res = json.decode(await OurFirebase.askVertexAi(image, prompt));
+
+      print(res);
+      desc.text = res["summary"]??"";
+      // 
+      glucoseValue= res["glucoseValue"]??70.0;
+
+      // 
+      update();
   }
 }

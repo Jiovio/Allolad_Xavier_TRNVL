@@ -73,7 +73,8 @@ var data = {
       "name": patient["name"],
       "gender": patient["gender"],
       "phone": patient["phone_number"],
-      "age": patient["age:"],
+      "age": patient["age"],
+      "data": json.encode(patient)
 };
 
 int aid = await db.insert("patients",data );

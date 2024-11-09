@@ -1,14 +1,14 @@
 
+
 import 'dart:convert';
 
+
 import 'package:allolab/Components/form.dart';
-import 'package:allolab/Components/textfield.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Controller/Reports/ultraSoundController.dart';
 import 'package:allolab/Screens/labReports/Widgets/selectorWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:numberpicker/numberpicker.dart';
 
@@ -18,18 +18,19 @@ class Ultrasound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        title: Text("Ultra Sound "),
+        title: Text("Ultra Sound"),
       ),
 
-      body: SingleChildScrollView(
+      body: 
+      GetBuilder<Ultrasoundcontroller>(
+        init: Ultrasoundcontroller(),
+        builder:(controller) => 
+      SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: 
-          GetBuilder(
-            init: Ultrasoundcontroller(),
-            builder:(controller) => 
-          Column(
+          child: Column(
 
             children: [
 
@@ -48,17 +49,19 @@ class Ultrasound extends StatelessWidget {
                                       child: Center(
                                         child: 
                                         controller.fileImage64 == null
-                                            ? Text(
+                                            ?const Text(
                                                 "NO IMAGE",
                                                 style: TextStyle(
                                                     fontSize: 18, color: White),
                                               )
                                             : Image.memory(base64Decode(
                                                 controller.fileImage64)),
+
+                                                
                                       ),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.all(10),
+                                      padding:const EdgeInsets.all(10),
                                       child: IconButton(
                                           icon:const Icon(
                                             Icons.arrow_back,
@@ -81,7 +84,7 @@ class Ultrasound extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: 
-     controller.fileImage64 == null
+                              controller.fileImage64 == null
                             ? Center(
                                 child: Text(
                                 "Click Add Image Button",
@@ -101,9 +104,9 @@ class Ultrasound extends StatelessWidget {
                           Row(
                             children: [
                               TextButton.icon(
-                                                onPressed: () => showModalBottomSheet(
+                                onPressed: () => showModalBottomSheet(
                                                     context: context,
-                                                    builder: (context) => Container(
+                                builder: (context) => Container(
                                 height: MediaQuery.of(context).size.height / 5,
                                 color: White,
                                 padding: EdgeInsets.only(top: 18.0, bottom: 18.0),
@@ -145,41 +148,43 @@ class Ultrasound extends StatelessWidget {
                                                 label: Text("Upload Report")),
 
 
-                                       TextButton.icon(onPressed: (){
+                                      //  TextButton.icon(onPressed: (){
                                           
-                                         }, 
-                                         icon: Icon(Icons.account_tree_sharp),
-                                         label: Text("Automatic"),) 
+                                      //    }, 
+                                      //    icon: Icon(Icons.account_tree_sharp),
+                                      //    label: Text("Automatic"),) 
                             ],
                           ),
 
-                          dropDown("Fetal Movement ", ["Present","Absent"],
-                          (text) {
-                               controller.fetalMovement = text;
-                              controller.update();
-                            }),
-
-
                                 SizedBox(
-                height: 20.0,
+                height: 10.0,
               ),
 
                           dropDown("Fetal Presentation", ["Cephalic", "Breech","Shoulder","Compound"],
-                          (text) {
-                              controller.fetalPresentation = text;
-                              controller.update();
-                            }),
+                          (t){
+                            controller.fetalPresentation = t;
+                            controller.update();
+                          },controller.fetalPresentation),
 
-                                                     SizedBox(
+            SizedBox(
+                height: 20.0,
+              ),
+
+               dropDown("Fetal Movement", ["Present","Absent"],(t){
+                controller.fetalMovement = t;
+                controller.update();
+               },controller.fetalMovement),
+
+
+              SizedBox(
                 height: 20.0,
               ),
 
                           dropDown("Placenta", 
-                          ["Posterior","Anterior","Fundal","Lateral","Low-lying"],
-                          (text) {
-                               controller.Placenta = text;
-                              controller.update();
-                            }),
+                          ["Posterior","Anterior","Fundal","Lateral","Low-lying"],(t){
+                            controller.Placenta = t;
+                            controller.update();
+                          },controller.Placenta),
 
                            SizedBox(
                 height: 20.0,
@@ -201,8 +206,7 @@ class Ultrasound extends StatelessWidget {
 
                                   content: Row(
                                     children: [
-
-                                          ultraSoundHeartMonitoring(),
+                                      ultraSoundHeartMonitoring(),
 
                                                         SizedBox(width: 10,),
 
@@ -235,14 +239,21 @@ class Ultrasound extends StatelessWidget {
               //     return null;
               //   },
               // ),
-
-              const SizedBox(
+                                            const SizedBox(
                 height: 20.0,
               ),
 
-              TFField(label: "Description",mLines: 5,),
+               TextFormField(
+                          decoration: InputDecoration(
+                            labelText: "Description",
+                            border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey))),
+                            controller: controller.desc,
+                          maxLines: 5
+                        ),
+                
 
-               const SizedBox(
+
+              const SizedBox(
                 height: 20.0,
               ),
 
@@ -260,9 +271,9 @@ class Ultrasound extends StatelessWidget {
 
 
             ],
-          )),
+          ),
           )
-        ),
+        )),
 
     );
   }

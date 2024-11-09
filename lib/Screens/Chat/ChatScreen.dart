@@ -1,15 +1,22 @@
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Config/OurFirebase.dart';
+import 'package:allolab/Controller/Chatdisplaycontroller.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/Screens/Chat/DoctorList.dart';
 import 'package:allolab/Screens/Chat/HealthWorker.dart';
 import 'package:allolab/Screens/Chat/PatientList.dart';
 import 'package:allolab/db/dbHelper.dart';
 import 'package:allolab/utils/backgroundservice.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+  ChatScreen({super.key});
+
+  ChatController cont = Get.put(ChatController());
+
+  Usercontroller userCont = Get.put(Usercontroller());
 
   @override
   Widget build(BuildContext context) {
@@ -47,17 +54,12 @@ class ChatScreen extends StatelessWidget {
                       //  settingsController.getHealthWorkerDetail(),
                       child:
                           // mainScreenController.healthWorkerDetails.length == 0
-                          false
+                          userCont.profile_pic==null
                               ? Container()
                               : CircleAvatar(
                                   backgroundColor: Colors.transparent,
                                   backgroundImage: 
-                                  NetworkImage("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"),
-                                  // NetworkImage(mainScreenController
-                                  //         .healthWorkerDetails[0].photo.isEmpty
-                                  //     ? "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
-                                  //     : mainScreenController
-                                  //         .healthWorkerDetails[0].photo),
+                                  CachedNetworkImageProvider(userCont.profile_pic as String) ,
                                   radius: 16,
                                 ),
                     ),
@@ -101,9 +103,9 @@ class ChatScreen extends StatelessWidget {
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: [
-            patientChatList(),
-            doctorList(context),
-            healthWorkerContactList(context),
+            patientChatList(cont),
+            doctorList(cont),
+            healthWorkerContactList(cont),
           ],
         ),
       ),
@@ -111,3 +113,5 @@ class ChatScreen extends StatelessWidget {
     );
   }
 }
+
+

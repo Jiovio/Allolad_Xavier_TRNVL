@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:allolab/Components/AppBar.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Screens/Patient/PatientDetails.dart';
 import 'package:allolab/db/dbHelper.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,6 +28,8 @@ class _PatientlistScreenState extends State<PatientlistScreen> {
 
   Future<void> _loadPatients() async {
     _allPatients = await getLocalPatients();
+
+    print(_allPatients);
     setState(() {
       _patientsFuture = Future.value(_allPatients);
     });
@@ -96,10 +101,21 @@ class _PatientlistScreenState extends State<PatientlistScreen> {
                           return ListTile(
                             leading: SizedBox(
                               height: 45,
-                              child: Image.network(
+                              child: 
+                              json.decode(patient["data"])["profile_pic"]==null?
+                              Image.network(
                                 "https://cdn-icons-png.flaticon.com/512/1533/1533506.png",
                                 fit: BoxFit.contain,
-                              ),
+                              ):
+                              ClipOval(
+                                child: CachedNetworkImage(imageUrl: json.decode(patient["data"])["profile_pic"],
+                                width: 40,
+                                height: 40, 
+                                fit: BoxFit.cover,            
+                                ),
+                              )
+                              
+                              ,
                             ),
                             title: Text(patient['name'] ?? ''),
                             subtitle: Row(
@@ -119,10 +135,15 @@ class _PatientlistScreenState extends State<PatientlistScreen> {
                               color: PrimaryColor,
                             ),
                             onTap: () {
+
+                              print(patient);
+                             
                               Get.to(
                                 () => PatientDetails(
                                   id: patient['uid'],
                                   name: patient['name'] ?? '',
+                                  data: json.decode(patient["data"]),
+                                  phone : patient["phone"]
                                 ),
                                 transition: Transition.rightToLeft,
                               );

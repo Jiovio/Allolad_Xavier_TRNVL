@@ -1,9 +1,11 @@
+import 'package:allolab/API/Local.dart';
 import 'package:allolab/Components/AppBar.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/Screens/Patient/PatientDetails.dart';
 import 'package:allolab/Screens/Patient/StartScreening.dart';
 import 'package:allolab/db/dbHelper.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -68,14 +70,18 @@ class HomeScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              false
-                                  ? CircleAvatar(
+                              controller.profile_pic==null
+                                  ?const CircleAvatar(
                                       backgroundColor: Colors.transparent,
                                       radius: 64,
+                                      backgroundImage: 
+                                      AssetImage("assets/placeholder.webp")
+                                      // NetworkImage("https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjg2OC1zYXNpLTA2LmpwZw.jpg"),
                                     )
                                   : CircleAvatar(
                                       backgroundColor: Colors.transparent,
-                                      backgroundImage: NetworkImage("https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjg2OC1zYXNpLTA2LmpwZw.jpg"),
+                                      backgroundImage: 
+                                      CachedNetworkImageProvider(controller.profile_pic as String),
                                       radius: 64,
                                     ),
                               Column(
@@ -113,7 +119,7 @@ class HomeScreen extends StatelessWidget {
                                           Text(
                                               false
                                                   ? ""
-                                                  : "R3nD)m",
+                                                  : Local.getUserID().toString(),
                                               style: TextStyle(
                                                   fontSize: 20,
                                                   color: Black,
@@ -151,7 +157,8 @@ class HomeScreen extends StatelessWidget {
                                               style: TextStyle(
                                                   color: Black.withOpacity(0.6),
                                                   fontSize: 14)),
-                                          Text("20-05-2021",
+                                          Text( " - - - ",
+                                            // "20-05-2021",
                                               style: TextStyle(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w700,
@@ -160,6 +167,8 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
+                                
+
                                 ],
                               )
                             ],
@@ -222,9 +231,9 @@ class HomeScreen extends StatelessWidget {
                                 onTap: () {
 
                                   
-                                  Get.to(
-                                      () => PatientDetails(id: 0, name: "",),
-                                      transition: Transition.rightToLeft);
+                                  // Get.to(
+                                  //     () => PatientDetails(id: 0, name: "",),
+                                  //     transition: Transition.rightToLeft);
 
                                   // Get.to(
                                   //     () => PeopleDetails(

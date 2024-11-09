@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Consultation extends StatelessWidget {
-  const Consultation({super.key});
+
+  dynamic data;
+  Consultation({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class Consultation extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Dr. Andrew",
+                        "Dr. ${data["doctor"]["name"]}",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w500),
                       ),
@@ -43,7 +45,7 @@ class Consultation extends StatelessWidget {
                         thickness: 2,
                       ),
                       Text(
-                        "Date : 28-04-2024",
+                        "Date : ${data["appointment_date"]}",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w500),
                       ),
@@ -51,7 +53,7 @@ class Consultation extends StatelessWidget {
                         height: 4,
                       ),
                       Text(
-                        "Time : 9:00 AM",
+                        "Time : ${data["start_time"]}",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w500),
                       ),
@@ -59,7 +61,7 @@ class Consultation extends StatelessWidget {
                         height: 4,
                       ),
                       Text(
-                        "Status : APPROVED",
+                        "Status : ${data["status"]}",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w500),
                       ),
@@ -67,7 +69,7 @@ class Consultation extends StatelessWidget {
                         height: 4,
                       ),
                       Text(
-                        "Diagnosis Desc : STOMACH PAIN",
+                        "Diagnosis Desc : ${data["reason"]}",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w500),
                       ),
@@ -85,18 +87,9 @@ class Consultation extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 splashColor: PrimaryColor,
                 onTap: () async {
-                  Get.to(SelfScreening(),
+                  Get.to(SelfScreening(id: data["id"]),
                   transition: Transition.rightToLeft);
                 },
-                //   Get.to(
-                //       () => SelfScreening(
-                //             from: "appointment",
-                //             appointmentId: appointment.appointmentId,
-                //             patientId: appointment.patientId,
-                //           ),
-                //       transition: Transition.rightToLeft);
-                // },
-
                 child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Row(

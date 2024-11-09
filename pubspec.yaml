@@ -57,9 +57,11 @@ dependencies:
   emoji_picker_flutter: ^3.1.0
   flutter_downloader: ^1.11.8
   permission_handler: ^11.3.1
-  flutter_background_service: ^5.0.10
   flutter_local_notifications: ^17.2.3
   workmanager: ^0.5.2
+  flutter_launcher_icons: ^0.14.1
+  agora_rtc_engine: ^6.0.0
+  flutter_ringtone_player: ^4.0.0+3
 
 
 
@@ -88,6 +90,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
       - assets/
+      - assets/icon/
       - assets/onboarding/
       - assets/Symptoms/
       - assets/Vitals/

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/GlobalPatientController.dart';
 import 'package:allolab/Controller/PatientsController.dart';
+import 'package:allolab/Controller/patient/Editprofilecontroller.dart';
 import 'package:allolab/Screens/Awareness/Awareness.dart';
 import 'package:allolab/Screens/Patient/Appointment.dart';
 import 'package:allolab/Screens/Patient/Checkup.dart';
@@ -9,6 +11,7 @@ import 'package:allolab/Screens/Patient/Report.dart';
 import 'package:allolab/Screens/Screening/SelfScreening.dart';
 import 'package:allolab/Screens/Profile/UpdateProfile.dart';
 import 'package:allolab/Screens/labReports/LabReports.dart';
+import 'package:allolab/db/sqlite.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/utils.dart';
@@ -17,9 +20,27 @@ import 'package:cached_network_image/cached_network_image.dart';
 class PatientDetails extends StatelessWidget {
   int id;
   String name;
-   PatientDetails({super.key, required this.id, required this.name});
+  String phone;
+
+  dynamic data;
+   PatientDetails({super.key, required this.id, required this.name, required this.data,
+   required this.phone}){
+     Get.lazyPut<Globalpatientcontroller>(() => Globalpatientcontroller());
+
+     gp.setUser(id,phone);
+   }
+
+  
+
+  //  Get
 
    Patientscontroller controller = Get.put(Patientscontroller());
+
+
+   Globalpatientcontroller gp = Get.put(Globalpatientcontroller());
+
+
+    
 
    dynamic argumentData = Get.arguments;
 
@@ -58,9 +79,10 @@ class PatientDetails extends StatelessWidget {
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(12),
                                       splashColor: PrimaryColor,
-                                      onTap: () {
+                                      onTap: ()async {
                                         // print(argumentData);
-                                        Get.to(()=>UpdateProfile(),transition: Transition.leftToRight);
+
+                                        Get.to(()=>UpdateProfile(id: id,),transition: Transition.leftToRight);
                                       } 
                                       ,
                                       child: Padding(
@@ -78,25 +100,20 @@ class PatientDetails extends StatelessWidget {
                                                   CircleAvatar(
                                                   backgroundColor:
                                                       Colors.transparent,
+                                                  radius: 52,
 
 
-                                                  child: false
-                                                  // controller .fileImage64 !=null
+                                                  child: data["profile_pic"]==null
+                 
                                                       ? 
                                                       Image.memory(
                                                           base64Decode("hi"
-                                                              // controller.fileImage64
                                                                   ),
                                                           fit: BoxFit.contain,
                                                         )
                                                       : CachedNetworkImage(
-                                                          imageUrl: true
-                                                          // patientDetails
-                                                          //         .photo!
-                                                          //         .isEmpty
-                                                              ? "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
-                                                              : "test",
-                                                              // patientDetails.photo!,
+                                                          imageUrl: 
+                                                          data["profile_pic"],
                                                           fit: BoxFit.contain,
                                                           imageBuilder: (context,
                                                                   imageProvider) =>
@@ -120,7 +137,6 @@ class PatientDetails extends StatelessWidget {
                                                               (context, url) =>
                                                                   Container(),
                                                         ),
-                                                  radius: 52,
                                                 ),
                                               
                                               SizedBox(
@@ -157,7 +173,7 @@ class PatientDetails extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(12),
                                       splashColor: PrimaryColor,
                                       onTap: () => 
-                                      Get.to(()=>UpdateProfile(),transition: Transition.leftToRight),
+                                      Get.to(()=>UpdateProfile(id: id,),transition: Transition.leftToRight),
                                       child: Padding(
                                         padding: const EdgeInsets.all(20.0),
                                         child: Container(
@@ -398,15 +414,10 @@ class PatientDetails extends StatelessWidget {
                       splashColor: PrimaryColor,
                       onTap: () {
                         Get.to(
-                            // () => Appointment(
-                            //       patientDetails: patientDetails,
-                            //     ),
                             ()=>LabReports(),
                             transition: Transition.rightToLeft);
                       },
-                      // Get.to(
-                      // () => Appointment(patientDetails: patientDetails),
-                      // transition: Transition.rightToLeft),
+
                       child: Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Row(
@@ -457,7 +468,7 @@ class PatientDetails extends StatelessWidget {
                             // () => MyAppointmentScreen(
                             //       patientDetails: patientDetails,
                             //     ),
-                            ()=>MyAppointmentScreen(),
+                            ()=>Currentappointment(),
                             transition: Transition.rightToLeft);
                       },
 
@@ -511,25 +522,10 @@ class PatientDetails extends StatelessWidget {
                       splashColor: PrimaryColor,
                       onTap: () {
                         Get.to(
-                            () => SelfScreening(),
+                            () => SelfScreening(id:id),
                             transition: Transition.rightToLeft);
-                
-                        // Get.to(
-                        //     () => SelfScreening(
-                        //           from: "home",
-                        //           patientId: patientDetails.id,
-                        //         ),
-                        //     transition: Transition.rightToLeft);
                       },
-                      // onTap: () => consultationController
-                      //             .filterConsultationList.length ==
-                      //         0
-                      //     ? showSnackBar("No Appointment Booked", "error")
-                      //     : Get.to(
-                      //         () => Consultation(
-                      //             consultation: consultationController
-                      //                 .filterConsultationList.last),
-                      //         transition: Transition.rightToLeft),
+
                       child: Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Row(

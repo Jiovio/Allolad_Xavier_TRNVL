@@ -24,6 +24,8 @@ Future<void> login () async {
   try {
     var req = await postRequest("/hw/login", {"email":uname, "password":pass});
 
+    print(req);
+
     localStorage.setItem("user", json.encode(req));
 
     Get.offAll(()=>MainScreen(),transition: Transition.cupertino);

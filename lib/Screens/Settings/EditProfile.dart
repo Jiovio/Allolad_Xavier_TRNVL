@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:allolab/API/Local.dart';
 import 'package:allolab/Config/Color.dart';
 import 'package:allolab/Controller/User/UserController.dart';
+import 'package:allolab/utils/camera.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +25,7 @@ class EditProfile extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.check),
               onPressed: () async {
-                // if (_formKey.currentState!.validate()) {
-                //   settingsController.updateInitialDetails();
-                // }
+                  userController.updatehealthworker();
               })
         ],
       ),
@@ -63,30 +63,26 @@ class EditProfile extends StatelessWidget {
                                                       )),
                                         context: context,
                                       ),
-                                  child: CircleAvatar(
-                                      backgroundColor: Colors.transparent,
-                                      radius: 64.0,
-                                      child: 
-                                      // controller.fileImage64 != null
-                                      //     ? Image.memory(
-                                      //         base64Decode(
-                                      //             controller.fileImage64),
-                                      //       )
-                                      //     : 
-                                          CachedNetworkImage(
-                                              imageUrl: 
-                                              // mainScreenController
-                                              //             .healthWorkerDetails
-                                              //             .length !=
-                                              //         0
-                                              //     ? mainScreenController
-                                              //             .healthWorkerDetails
-                                              //             .first
-                                              //             .photo
-                                              //             .isEmpty
-                                              //         ? 
-                                                      "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
-                                            ))),
+                                  child: GetBuilder<Usercontroller>(
+
+                                    builder: (controller) =>
+
+                                    controller.profile_pic!=null?
+                                    CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 64.0,
+                                        backgroundImage: 
+                                            CachedNetworkImageProvider(
+                                              controller.profile_pic as String
+                                              ))
+                                  :const CircleAvatar(
+                                        backgroundColor: Colors.transparent,
+                                        radius: 64.0,
+                                        backgroundImage: 
+                                            CachedNetworkImageProvider(
+                                              "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+                                              )),
+                                  )),
                           SizedBox(
                             height: 50,
                             width: 50,
@@ -117,10 +113,18 @@ class EditProfile extends StatelessWidget {
                                         FloatingActionButton(
                                             elevation: 0,
                                             tooltip: "Camera".tr,
-                                            onPressed: () {
-                                              // settingsController
-                                              //     .getImageFromCamera();
-                                           
+                                            onPressed: () async {
+                                              final url = await Imageutils.getImageFromCamera("profilepic",Local.getUserID().toString());
+                                              if(url!=null){
+                                              userController.profile_pic =  url;
+                                              userController.setUpdateData("profile_pic_url", url);
+                                              userController.update();
+
+
+                                                Navigator.pop(
+                                                context
+                                              );
+                                           }
                                             },
                                             backgroundColor: Colors.amberAccent,
                                             child: Image.asset(
@@ -131,14 +135,15 @@ class EditProfile extends StatelessWidget {
                                             elevation: 0,
                                             focusColor: Colors.greenAccent,
                                             tooltip: "Gallery".tr,
-                                            onPressed: () {
-                                              // settingsController
-                                              //     .getImageFromGallery();
+                                            onPressed: () async {
+                                              final url = await Imageutils.getImageFromCamera("profilepic",Local.getUserID().toString());
+                                              if(url!=null){
+                                              userController.profile_pic =  url;
+                                              userController.setUpdateData("profile_pic_url", url);
+                                              userController.update();
+                                           }
                                               Navigator.pop(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        EditProfile()),
+                                                context
                                               );
                                             },
                                             
@@ -189,6 +194,10 @@ class EditProfile extends StatelessWidget {
                   },
                   decoration: InputDecoration(
                       labelText: "Name".tr, border: OutlineInputBorder()),
+
+                      onChanged: (value) {
+                        userController.setUpdateData("name", value);
+                      },
                 ),
                 SizedBox(
                   height: 12.0,
@@ -215,6 +224,8 @@ class EditProfile extends StatelessWidget {
                         items: ["Male", "Female"],
                         onChanged: (value) {
                           userController.gender = value!;
+                        userController.setUpdateData("gender", value);
+
                         },
                       ),
                     ),
@@ -234,6 +245,9 @@ class EditProfile extends StatelessWidget {
                           }
                           return null;
                         },
+                                              onChanged: (value) {
+                        userController.setUpdateData("age", value);
+                      },
                       ),
                     ),
                   ],
@@ -257,6 +271,8 @@ class EditProfile extends StatelessWidget {
                     items: yoe,
                     onChanged: (value) {
                       userController.yearOfExperience = value!;
+                        userController.setUpdateData("year_of_experience", value);
+
                     },
                   ),
                 ),
@@ -273,6 +289,10 @@ class EditProfile extends StatelessWidget {
                   },
                   decoration: InputDecoration(
                       labelText: "Title".tr, border: OutlineInputBorder()),
+
+                                            onChanged: (value) {
+                        userController.setUpdateData("title", value);
+                      },
                 ),
                 SizedBox(
                   height: 20.0,
@@ -288,6 +308,9 @@ class EditProfile extends StatelessWidget {
                   height: 16.0,
                 ),
                 TextFormField(
+                                        onChanged: (value) {
+                        userController.setUpdateData("address", value);
+                      },
                   controller: userController.address,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -311,6 +334,9 @@ class EditProfile extends StatelessWidget {
                     }
                     return null;
                   },
+                                        onChanged: (value) {
+                        userController.setUpdateData("pincode", value);
+                      },
                   decoration: InputDecoration(
                       labelText: "Pincode".tr, border: OutlineInputBorder()),
                 ),

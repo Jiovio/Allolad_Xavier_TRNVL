@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+
 import 'package:allolab/Components/CameraCapture.dart';
 import 'package:allolab/Components/form.dart';
 import 'package:allolab/Components/textfield.dart';
@@ -18,9 +19,8 @@ class Urine extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Urine Report"),
+        title:const Text("Urine Report"),
       ),
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -30,6 +30,17 @@ class Urine extends StatelessWidget {
             builder:(controller) => 
           Column(
             children: [
+
+                                      SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                              "Add Urine Test Report",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                            ),
+
               GestureDetector(
                 onTap: () => showDialog(
                             context: context,
@@ -52,12 +63,6 @@ class Urine extends StatelessWidget {
                                               )
                                             : Image.memory(base64Decode(
                                                 controller.fileImage64)),
-
-                                              // Text(
-                                              //   "NO IMAGE",
-                                              //   style: TextStyle(
-                                              //       fontSize: 18, color: White),
-                                              // )
                                                 
                                       ),
                                     ),
@@ -137,8 +142,7 @@ class Urine extends StatelessWidget {
                                         onPressed: () => 
                                             controller.getImageFromGallery(),
                                         backgroundColor: Colors.indigoAccent,
-                                        child: Image.asset(
-                                          'assets/gallery.png',
+                                        child: Image.asset('assets/gallery.png',
                                           scale: 16,
                                         )),
                                   ],
@@ -161,12 +165,14 @@ class Urine extends StatelessWidget {
                               ),
 
                           dropDown(
+                          
                             "Alpamine Present", 
                             ["Yes", "No"],
                             (text) {
                               controller.alphaminePresent = text;
                               controller.update();
-                            }
+                            },
+                            controller.alphaminePresent
                             ),
 
                          
@@ -179,7 +185,7 @@ class Urine extends StatelessWidget {
                           (text) {
                               controller.sugarPresent = text;
                               controller.update();
-                            }),
+                            },controller.sugarPresent),
 
 
 

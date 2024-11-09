@@ -1,6 +1,8 @@
 import 'package:allolab/Config/Color.dart';
+import 'package:allolab/Controller/User/UserController.dart';
 import 'package:allolab/Screens/Notification/NotificationView.dart';
 import 'package:allolab/Screens/Settings/LanguageDialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -12,6 +14,9 @@ PreferredSize customAppBar(
     // ignore: non_constant_identifier_names
     required Color Color,
     required double elevation}) {
+
+
+      Usercontroller cont = Get.put(Usercontroller());
 
   return PreferredSize(
       preferredSize: Size.fromHeight(100.0),
@@ -55,12 +60,12 @@ PreferredSize customAppBar(
                           GestureDetector(
                             onTap: () {},
                                 // settingsController.getHealthWorkerDetail(),
-                            child: false
+                            child: cont.profile_pic==null
                                 ? Container()
                                 : CircleAvatar(
                                     backgroundColor: Colors.transparent,
                                     radius: 16.0,
-                                    backgroundImage: NetworkImage("https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjg2OC1zYXNpLTA2LmpwZw.jpg")),
+                                    backgroundImage: CachedNetworkImageProvider(cont.profile_pic as String)),
                           ),
                 ],
               )

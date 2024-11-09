@@ -43,7 +43,7 @@ class Patientscontroller extends GetxController {
   void navigateToPatient(data) async {
     print(patient);
     addPatientToHistory(patient);
-  Get.to(()=>PatientDetails(id: data["id"],name: data["name"]),arguments: data);
+  Get.to(()=>PatientDetails(id: data["id"],name: data["name"],data: data, phone: data["phone_number"],),arguments: data);
 
   }
 
